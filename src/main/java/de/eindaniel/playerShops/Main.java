@@ -1,0 +1,77 @@
+package de.eindaniel.playerShops;
+
+import de.eindaniel.playerShops.commands.CreateShopCommand;
+import de.eindaniel.playerShops.commands.RemoveShopCommand;
+import de.eindaniel.playerShops.economy.VaultHook;
+import de.eindaniel.playerShops.entity.ShopEntityManager;
+import de.eindaniel.playerShops.listener.InteractionListener;
+import de.eindaniel.playerShops.listener.ProtectionListener;
+import de.eindaniel.playerShops.shop.ShopManager;
+import de.eindaniel.playerShops.shop.ShopStorage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandMap;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.awt.*;
+
+public class Main extends JavaPlugin {
+
+    private static Main instance;
+
+    private VaultHook vault;
+    private ShopStorage storage;
+    private ShopManager shopManager;
+    private ShopEntityManager entityManager;
+
+    public static Main get() { return instance; }
+    public VaultHook vault() { return vault; }
+    public ShopStorage storage() { return storage; }
+    public ShopManager shops() { return shopManager; }
+    public ShopEntityManager entities() { return entityManager; }
+
+    @Override
+    public void onEnable() {
+        instance = this;
+
+        vault = new VaultHook(this);
+        if (!vault.hook()) {
+            getLogger().severe("Vault oder Economy fehlt. Deaktiviere Plugin.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        storage = new ShopStorage(this);
+        shopManager = new ShopManager(this, storage);
+        entityManager = new ShopEntityManager(this, shopManager);
+
+        CommandMap commandMap = Bukkit.getCommandMap();
+        commandMap.register("playershops", new CreateShopCommand(this));
+        commandMap.register("playershops", new RemoveShopCommand(this));
+
+        getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
+        getServer().getPluginManager().registerEvents(new ProtectionListener(), this);
+
+        storage.loadAll();
+        entityManager.spawnAll();
+
+        getLogger().info("PlayerShops aktiviert.");
+    }
+
+    @Override
+    public void onDisable() {
+        try {
+            entityManager.despawnAll();
+            storage.saveAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        getLogger().info("PlayerShops deaktiviert.");
+    }
+
+    public static Component prefix() {
+        Component prefix = MiniMessage.miniMessage().deserialize("<dark_gray>[<#ffdd00>Spielershops<dark_gray>] <reset>");
+        return prefix;
+    }
+}

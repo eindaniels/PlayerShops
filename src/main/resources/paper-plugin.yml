@@ -1,0 +1,12 @@
+name: PlayerShops
+version: ${version}
+main: de.eindaniel.playerShops.Main
+authors:
+  - eindaniel (Entwickler)
+  - Cytooxien (Idee von deren Spielershops)
+api-version: '1.21'
+dependencies:
+  server:
+    Vault:
+      required: true
+      load: BEFORE

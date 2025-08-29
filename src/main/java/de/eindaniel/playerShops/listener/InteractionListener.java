@@ -4,9 +4,11 @@ import de.eindaniel.playerShops.Main;
 import de.eindaniel.playerShops.gui.ShopGui;
 import de.eindaniel.playerShops.gui.ShopStashGui;
 import de.eindaniel.playerShops.shop.PlayerShop;
+import de.eindaniel.playerShops.util.ChatInputHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Interaction;
@@ -21,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -86,7 +89,10 @@ public class InteractionListener implements Listener {
             e.setCancelled(true);
 
             PlayerShop shop = nearestShopToViewer(p);
-            if (shop == null) { p.closeInventory(); return; }
+            if (shop == null) {
+                p.closeInventory();
+                return;
+            }
 
             if (shop.getOwner().equals(p.getUniqueId())) {
                 p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Du kannst deinen eigenen Shop nicht benutzen.")));
@@ -119,9 +125,11 @@ public class InteractionListener implements Listener {
                 Component bought = MiniMessage.miniMessage().deserialize("<#1fff17>Gekauft! + <gray>" + taken + "x <white><lang:" + shop.getMaterial().translationKey() + "> <gray>für <#a3ff2b>" + String.format("%.2f€", price));
                 p.sendMessage(Main.prefix().append(bought));
                 plugin.entities().updateLabel(shop);
-                try { plugin.storage().saveAll(); } catch (Exception ignored) {}
-            }
-            else if (slot == 15 && shop.isSellEnabled()) {
+                try {
+                    plugin.storage().saveAll();
+                } catch (Exception ignored) {
+                }
+            } else if (slot == 15 && shop.isSellEnabled()) {
                 int need = shop.getAmountPerTrade();
                 if (!hasItems(p, shop.getMaterial(), need)) {
                     p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Du hast nicht genug <lang:" + shop.getMaterial().translationKey() + ">.")));
@@ -148,15 +156,19 @@ public class InteractionListener implements Listener {
                 Component selled = MiniMessage.miniMessage().deserialize("<#1fff17>Verkauft! -<gray>" + need + "x <white><lang:" + shop.getMaterial().translationKey() + "> <grayfür <#a3ff2b>" + String.format("%.2f€", price));
                 p.sendMessage(Main.prefix().append(selled));
                 plugin.entities().updateLabel(shop);
-                try { plugin.storage().saveAll(); } catch (Exception ignored) {}
+                try {
+                    plugin.storage().saveAll();
+                } catch (Exception ignored) {
+                }
             }
             return;
         }
 
-        // --- Stash-GUI (Owner) ---
+// --- Stash-GUI (Owner) ---
         if (ShopStashGui.isStash(e.getView().title())) {
             int slot = e.getRawSlot();
 
+            // --- Toggle verkaufen/kaufen ---
             if (slot == 43 || slot == 44 || slot == 40) {
                 e.setCancelled(true);
 
@@ -172,28 +184,115 @@ public class InteractionListener implements Listener {
 
                 if (slot == 43) {
                     shop.setSellEnabled(!shop.isSellEnabled());
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#fbecab>Verkaufen an Shop: " + (shop.isSellEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert")).decoration(TextDecoration.ITALIC,false)));
+//                    p.sendMessage(Main.prefix().append(
+//                            MiniMessage.miniMessage().deserialize("<#fbecab>Verkaufen an Shop: "
+//                                            + (shop.isSellEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert"))
+//                                    .decoration(TextDecoration.ITALIC, false)
+//                    ));
 
                     ItemStack toggleSell = new ItemStack(shop.isSellEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
                     ItemMeta sm = toggleSell.getItemMeta();
-                    if (sm != null) sm.displayName(MiniMessage.miniMessage().deserialize("<#fbecab>Verkaufen an Shop: " + (shop.isSellEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert")).decoration(TextDecoration.ITALIC,false));
+                    if (sm != null) {
+                        sm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufsstatus ändern").decoration(TextDecoration.ITALIC,false));
+                        sm.lore(List.of(
+                                MiniMessage.miniMessage().deserialize((shop.isSellEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert")).decoration(TextDecoration.ITALIC,false)
+                        ));
+                    }
                     toggleSell.setItemMeta(sm);
                     e.getInventory().setItem(43, toggleSell);
 
                     plugin.entities().updateLabel(shop);
-                    try { plugin.storage().saveAll(); } catch (Exception ignored) {}
-                } else {
+                    try {
+                        plugin.storage().saveAll();
+                    } catch (Exception ignored) {
+                    }
+                } else if (slot == 44) {
                     shop.setBuyEnabled(!shop.isBuyEnabled());
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#fbecab>Kaufen an Shop: " + (shop.isBuyEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert"))).decoration(TextDecoration.ITALIC,false));
+//                    p.sendMessage(Main.prefix().append(
+//                            MiniMessage.miniMessage().deserialize("<#fbecab>Kaufen an Shop: "
+//                                            + (shop.isBuyEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert"))
+//                                    .decoration(TextDecoration.ITALIC, false)
+//                    ));
 
                     ItemStack toggleBuy = new ItemStack(shop.isBuyEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
                     ItemMeta bm = toggleBuy.getItemMeta();
-                    if (bm != null) bm.displayName(MiniMessage.miniMessage().deserialize("<#fbecab>Kaufen an Shop: " + (shop.isBuyEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert")).decoration(TextDecoration.ITALIC,false));
+                    if (bm != null) {
+                        bm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Kaufsstatus ändern").decoration(TextDecoration.ITALIC,false));
+                        bm.lore(List.of(
+                                MiniMessage.miniMessage().deserialize(shop.isBuyEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert").decoration(TextDecoration.ITALIC,false))
+                        );
+                    }
                     toggleBuy.setItemMeta(bm);
                     e.getInventory().setItem(44, toggleBuy);
 
                     plugin.entities().updateLabel(shop);
-                    try { plugin.storage().saveAll(); } catch (Exception ignored) {}
+                    try {
+                        plugin.storage().saveAll();
+                    } catch (Exception ignored) {
+                    }
+                }
+                return;
+            }
+
+            if (slot == 36 || slot == 37) {
+                e.setCancelled(true);
+
+                String key = ShopStashGui.OPEN.get(p.getUniqueId());
+                if (key == null) return;
+                var shopOpt = plugin.shops().getByKey(key);
+                if (shopOpt.isEmpty()) return;
+                PlayerShop shop = shopOpt.get();
+
+                if (slot == 36) {
+                    p.closeInventory();
+                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<gray>Bitte gib einen neuen <#a3ff2b>Verkaufspreis<gray> im Chat ein.")));
+                    new ChatInputHandler(p, input -> {
+                        try {
+                            double price = Double.parseDouble(input);
+                            shop.setSellPrice(price);
+                            p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#a3ff2b>Verkaufspreis geändert zu <dark_gray>→ <#a3ff2b>" + price)));
+                            plugin.entities().updateLabel(shop);
+                            try {
+                                plugin.storage().saveAll();
+                            } catch (Exception ignored) {
+                            }
+                        } catch (NumberFormatException ex) {
+                            p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Ungültige Zahl!")));
+                        }
+                        Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
+                    });
+                }
+
+                if (slot == 37) {
+                    p.closeInventory();
+                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
+                            "<gray>Bitte gib einen neuen <#a3ff2b>Ankaufspreis<gray> im Chat ein.")));
+
+                    new ChatInputHandler(p, input -> {
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                            if (input.equalsIgnoreCase("abbrechen")) {
+                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Eingabe abgebrochen.")));
+                                new ShopStashGui(plugin, shop).openFor(p);
+                                return;
+                            }
+
+                            try {
+                                double price = Double.parseDouble(input);
+                                shop.setBuyPrice(price);
+                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
+                                        "<#a3ff2b>Ankaufspreis geändert zu <dark_gray>→ <#a3ff2b>" + price)));
+
+                                plugin.entities().updateLabel(shop);
+                                try {
+                                    plugin.storage().saveAll();
+                                } catch (Exception ignored) {}
+
+                            } catch (NumberFormatException ex) {
+                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Ungültige Zahl!")));
+                            }
+                            new ShopStashGui(plugin, shop).openFor(p);
+                        });
+                    });
                 }
                 return;
             }
@@ -204,6 +303,7 @@ public class InteractionListener implements Listener {
             }
         }
     }
+
 
     private PlayerShop nearestShopToViewer(Player p) {
         return plugin.shops().all().stream()

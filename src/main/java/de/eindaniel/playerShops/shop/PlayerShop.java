@@ -49,6 +49,14 @@ public class PlayerShop {
                 baseLocation.getBlockX() + ":" + baseLocation.getBlockY() + ":" + baseLocation.getBlockZ();
     }
 
+    public void setSellPrice(double sellPrice) {
+        this.sellPrice = sellPrice;
+    }
+
+    public void setBuyPrice(double buyPrice) {
+        this.buyPrice = buyPrice;
+    }
+
     public int countStashMaterial() {
         int n = 0;
         for (ItemStack is : stashItems) {

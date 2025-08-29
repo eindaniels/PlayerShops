@@ -56,15 +56,39 @@ public class ShopStashGui {
 
         ItemStack toggleSell = new ItemStack(shop.isSellEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
         var sm = toggleSell.getItemMeta();
-        sm.displayName(MiniMessage.miniMessage().deserialize("<#fbecab>Verkaufen an Shop: " + (shop.isSellEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert")).decoration(TextDecoration.ITALIC,false));
+        sm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufsstatus ändern").decoration(TextDecoration.ITALIC,false));
+        sm.lore(List.of(
+                MiniMessage.miniMessage().deserialize((shop.isSellEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert")).decoration(TextDecoration.ITALIC,false)
+        ));
         toggleSell.setItemMeta(sm);
         inv.setItem(43, toggleSell);
 
         ItemStack toggleBuy = new ItemStack(shop.isBuyEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
         var bm = toggleBuy.getItemMeta();
-        bm.displayName(MiniMessage.miniMessage().deserialize("<#fbecab>Verkaufen an Shop: " + (shop.isBuyEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert")).decoration(TextDecoration.ITALIC,false));
+        bm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Kaufsstatus ändern").decoration(TextDecoration.ITALIC,false));
+        bm.lore(List.of(
+                MiniMessage.miniMessage().deserialize(shop.isBuyEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert").decoration(TextDecoration.ITALIC,false))
+        );
         toggleBuy.setItemMeta(bm);
         inv.setItem(44, toggleBuy);
+
+        ItemStack changeSellPrice = new ItemStack(Material.NAME_TAG);
+        var spm = changeSellPrice.getItemMeta();
+        spm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufspreis ändern").decoration(TextDecoration.ITALIC,false));
+        spm.lore(List.of(
+                MiniMessage.miniMessage().deserialize("<gray>Aktueller Verkaufspreis <dark_gray>→ <#a3ff2b>" + shop.getSellPrice() + "€").decoration(TextDecoration.ITALIC,false)
+        ));
+        changeSellPrice.setItemMeta(spm);
+        inv.setItem(36, changeSellPrice);
+
+        ItemStack changeBuyPrice = new ItemStack(Material.NAME_TAG);
+        var bpm = changeBuyPrice.getItemMeta();
+        bpm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Ankaufspreis ändern").decoration(TextDecoration.ITALIC,false));
+        bpm.lore(List.of(
+                MiniMessage.miniMessage().deserialize("<gray>Aktueller Ankaufspreis <dark_gray>→ <#a3ff2b>" + shop.getBuyPrice() + "€").decoration(TextDecoration.ITALIC,false)
+        ));
+        changeBuyPrice.setItemMeta(bpm);
+        inv.setItem(37, changeBuyPrice);
 
         return inv;
     }

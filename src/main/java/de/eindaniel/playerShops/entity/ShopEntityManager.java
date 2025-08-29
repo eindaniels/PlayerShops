@@ -4,7 +4,9 @@ import de.eindaniel.playerShops.Main;
 import de.eindaniel.playerShops.shop.PlayerShop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -124,5 +126,19 @@ public class ShopEntityManager {
     public static final class Keys {
         public static final org.bukkit.NamespacedKey SHOP_KEY =
                 new org.bukkit.NamespacedKey(Main.get(), "shop_key");
+    }
+
+    public void hardDespawnAll() {
+        for (World world : Bukkit.getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                if (entity instanceof Display || entity instanceof Interaction) {
+                    // nur löschen, wenn keine Shop-NBT dran hängt
+                    var pdc = entity.getPersistentDataContainer();
+                    if (!pdc.has(ShopEntityManager.Keys.SHOP_KEY, PersistentDataType.STRING)) {
+                        entity.remove();
+                    }
+                }
+            }
+        }
     }
 }

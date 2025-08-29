@@ -39,7 +39,6 @@ Es kann sich jederzeit ändern, Funktionen können noch unvollständig sein und 
 3. Stelle sicher, dass **Vault** und ein Economy-Plugin installiert sind.
 4. Starte den Server neu.
 5. Erstelle deinen ersten Shop & genieße den Handel!
-
 ---
 
 ## ⚙️ Commands
@@ -72,7 +71,7 @@ Es kann sich jederzeit ändern, Funktionen können noch unvollständig sein und 
 - Shop-Besitzer können im **Stash-GUI**:
     - Items einlagern / entnehmen
     - Kaufen/Verkaufen toggeln
-    - Preise anpassen (ToDo)
+    - Preise anpassen
 
 ---
 

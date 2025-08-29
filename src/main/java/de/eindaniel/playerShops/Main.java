@@ -4,6 +4,7 @@ import de.eindaniel.playerShops.commands.CreateShopCommand;
 import de.eindaniel.playerShops.commands.RemoveShopCommand;
 import de.eindaniel.playerShops.economy.VaultHook;
 import de.eindaniel.playerShops.entity.ShopEntityManager;
+import de.eindaniel.playerShops.listener.ChatInputListener;
 import de.eindaniel.playerShops.listener.InteractionListener;
 import de.eindaniel.playerShops.listener.ProtectionListener;
 import de.eindaniel.playerShops.shop.ShopManager;
@@ -13,8 +14,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.awt.*;
 
 public class Main extends JavaPlugin {
 
@@ -52,6 +51,8 @@ public class Main extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
         getServer().getPluginManager().registerEvents(new ProtectionListener(), this);
+        getServer().getPluginManager().registerEvents(new ChatInputListener(), this);
+        entityManager.spawnAll();
 
         storage.loadAll();
         entityManager.spawnAll();

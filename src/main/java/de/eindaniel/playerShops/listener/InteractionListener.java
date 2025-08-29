@@ -234,7 +234,7 @@ public class InteractionListener implements Listener {
                 return;
             }
 
-            if (slot == 36 || slot == 37) {
+            if (slot == 36 || slot == 37 || slot == 38) {
                 e.setCancelled(true);
 
                 String key = ShopStashGui.OPEN.get(p.getUniqueId());
@@ -281,6 +281,37 @@ public class InteractionListener implements Listener {
                                 shop.setBuyPrice(price);
                                 p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
                                         "<#a3ff2b>Ankaufspreis geändert zu <dark_gray>→ <#a3ff2b>" + price)));
+
+                                plugin.entities().updateLabel(shop);
+                                try {
+                                    plugin.storage().saveAll();
+                                } catch (Exception ignored) {}
+
+                            } catch (NumberFormatException ex) {
+                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Ungültige Zahl!")));
+                            }
+                            new ShopStashGui(plugin, shop).openFor(p);
+                        });
+                    });
+                }
+                if (slot == 38) {
+                    p.closeInventory();
+                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
+                            "<gray>Bitte gib eine neue <#a3ff2b>Verkaufsmenge<gray> im Chat ein.")));
+
+                    new ChatInputHandler(p, input -> {
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                            if (input.equalsIgnoreCase("abbrechen")) {
+                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Eingabe abgebrochen.")));
+                                new ShopStashGui(plugin, shop).openFor(p);
+                                return;
+                            }
+
+                            try {
+                                int amount = Integer.parseInt(input);
+                                shop.setAmountPerTrade(amount);
+                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
+                                        "<#a3ff2b>Verkaufsmenge geändert zu <dark_gray>→ <#fbecab>" + amount + "x")));
 
                                 plugin.entities().updateLabel(shop);
                                 try {

@@ -90,6 +90,15 @@ public class ShopStashGui {
         changeBuyPrice.setItemMeta(bpm);
         inv.setItem(37, changeBuyPrice);
 
+        ItemStack changeAmount = new ItemStack(Material.NAME_TAG);
+        var am = changeAmount.getItemMeta();
+        am.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufsmenge ändern").decoration(TextDecoration.ITALIC,false));
+        am.lore(List.of(
+                MiniMessage.miniMessage().deserialize("<gray>Aktuelle Verkaufsmenge <dark_gray>→ <#a3ff2b>" + shop.getAmountPerTrade() + "x").decoration(TextDecoration.ITALIC,false)
+        ));
+        changeAmount.setItemMeta(am);
+        inv.setItem(38, changeAmount);
+
         return inv;
     }
 

@@ -11,7 +11,7 @@ public class PlayerShop {
     private final UUID owner;
     private final Location baseLocation;          // Mittelpunkt des Blocks
     private final Material material;              // Welches Item wird gehandelt
-    private final int amountPerTrade;             // Menge
+    private int amountPerTrade;             // Menge
     private double buyPrice;                      // Spieler zahlt (Shop verkauft)  -> "Verkauf:"
     private double sellPrice;                     // Spieler bekommt (Shop kauft)   -> "Ankauf:"
 
@@ -47,6 +47,10 @@ public class PlayerShop {
     public String key() {
         return baseLocation.getWorld().getName() + ":" +
                 baseLocation.getBlockX() + ":" + baseLocation.getBlockY() + ":" + baseLocation.getBlockZ();
+    }
+
+    public void setAmountPerTrade(int amountPerTrade) {
+        this.amountPerTrade = amountPerTrade;
     }
 
     public void setSellPrice(double sellPrice) {

@@ -169,7 +169,7 @@ public class InteractionListener implements Listener {
             int slot = e.getRawSlot();
 
             // --- Toggle verkaufen/kaufen ---
-            if (slot == 43 || slot == 44 || slot == 40) {
+            if (slot == 43 || slot == 44 || slot == 40 || slot == 39 || slot == 41 || slot == 42) {
                 e.setCancelled(true);
 
                 String key = ShopStashGui.OPEN.get(p.getUniqueId());

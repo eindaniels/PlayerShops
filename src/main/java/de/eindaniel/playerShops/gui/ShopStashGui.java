@@ -38,21 +38,23 @@ public class ShopStashGui {
             inv.setItem(idx++, is.clone());
         }
 
-        ItemStack info = new ItemStack(Material.PAPER);
-        var im = info.getItemMeta();
-        im.displayName(MiniMessage.miniMessage().deserialize("<#fbecab>ℹ Shop Informationen").decoration(TextDecoration.ITALIC,false));
-        Component item = MiniMessage.miniMessage().deserialize("<gray>Item <dark_gray>→ <#fbecab><lang:" + shop.getMaterial().translationKey() + ">");
-        Component menge = MiniMessage.miniMessage().deserialize("<gray>Menge/Trade <dark_gray>→ <#fbecab>" + shop.getAmountPerTrade() + "x");
-        Component verkauf = MiniMessage.miniMessage().deserialize("<gray>Verkauf (Kaufen) <dark_gray>→ <#fbecab>" + fmt(shop.getBuyPrice()));
-        Component ankauf = MiniMessage.miniMessage().deserialize("<gray>Ankauf (Verkaufen) <dark_gray>→ <#fbecab>" + fmt(shop.getSellPrice()));
-        im.lore(List.of(
-                item.decoration(TextDecoration.ITALIC,false),
-                menge.decoration(TextDecoration.ITALIC,false),
-                verkauf.decoration(TextDecoration.ITALIC,false),
-                ankauf.decoration(TextDecoration.ITALIC,false)
-        ));
-        info.setItemMeta(im);
-        inv.setItem(40, info);
+        // Ist nicht so useful, wenn alle Settings mit den Werten bereits im StashGUI sind.
+
+//        ItemStack info = new ItemStack(Material.PAPER);
+//        var im = info.getItemMeta();
+//        im.displayName(MiniMessage.miniMessage().deserialize("<#fbecab>ℹ Shop Informationen").decoration(TextDecoration.ITALIC,false));
+//        Component item = MiniMessage.miniMessage().deserialize("<gray>Item <dark_gray>→ <#fbecab><lang:" + shop.getMaterial().translationKey() + ">");
+//        Component menge = MiniMessage.miniMessage().deserialize("<gray>Menge/Trade <dark_gray>→ <#fbecab>" + shop.getAmountPerTrade() + "x");
+//        Component verkauf = MiniMessage.miniMessage().deserialize("<gray>Verkauf (Kaufen) <dark_gray>→ <#fbecab>" + fmt(shop.getBuyPrice()));
+//        Component ankauf = MiniMessage.miniMessage().deserialize("<gray>Ankauf (Verkaufen) <dark_gray>→ <#fbecab>" + fmt(shop.getSellPrice()));
+//        im.lore(List.of(
+//                item.decoration(TextDecoration.ITALIC,false),
+//                menge.decoration(TextDecoration.ITALIC,false),
+//                verkauf.decoration(TextDecoration.ITALIC,false),
+//                ankauf.decoration(TextDecoration.ITALIC,false)
+//        ));
+//        info.setItemMeta(im);
+//        inv.setItem(40, info);
 
         ItemStack toggleSell = new ItemStack(shop.isSellEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
         var sm = toggleSell.getItemMeta();

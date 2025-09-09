@@ -120,7 +120,7 @@ public class ShopEntityManager {
 
     private net.kyori.adventure.text.Component label(PlayerShop shop) {
         String item = shop.getMaterial().translationKey();
-        return MiniMessage.miniMessage().deserialize("<gray>" + shop.getAmountPerTrade() + "x <white><lang:" + item + ">\n" + (shop.isSellEnabled() ? "<#fbecab>Verkauf: <#a3ff2b>" + shop.getBuyPrice() + "€" : "<#ff1717><st>Verkauf: " + shop.getBuyPrice() + "€<reset>") + "\n" + (shop.isBuyEnabled() ? "<#fbecab>Ankauf: <#a3ff2b>" + shop.getSellPrice() + "€" : "<#ff1717><st>Ankauf: " + shop.getSellPrice() + "€<reset>"));
+        return MiniMessage.miniMessage().deserialize("<gray>" + shop.getAmountPerTrade() + "x <white><lang:" + item + ">\n" + (shop.isBuyEnabled() ? "<#fbecab>Verkauf: <#a3ff2b>" + shop.getBuyPrice() + "€" : "<#ff1717><st>Verkauf: " + shop.getBuyPrice() + "€<reset>") + "\n" + (shop.isSellEnabled() ? "<#fbecab>Ankauf: <#a3ff2b>" + shop.getSellPrice() + "€" : "<#ff1717><st>Ankauf: " + shop.getSellPrice() + "€<reset>"));
     }
 
     public static final class Keys {

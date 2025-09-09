@@ -122,8 +122,12 @@ public class InteractionListener implements Listener {
                 int taken = shop.takeFromStash(need);
                 p.getInventory().addItem(new ItemStack(shop.getMaterial(), taken));
 
-                Component bought = MiniMessage.miniMessage().deserialize("<#1fff17>Gekauft! +<gray>" + taken + "x <white><lang:" + shop.getMaterial().translationKey() + "> <gray>für <#a3ff2b>" + String.format("%.2f€", price));
-                p.sendMessage(Main.prefix().append(bought));
+                Component bought1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
+                Component bought2 = MiniMessage.miniMessage().deserialize("<#1fff17>+ <gray>" + taken + "x <white><lang:" + shop.getMaterial().translationKey() + ">");
+                Component bought3 = MiniMessage.miniMessage().deserialize("<#ff1717>- <#a3ff2b>" + String.format("%.2f€", price));
+                p.sendMessage(Main.prefix().append(bought1));
+                p.sendMessage(Main.prefix().append(bought2));
+                p.sendMessage(Main.prefix().append(bought3));
                 plugin.entities().updateLabel(shop);
                 try {
                     plugin.storage().saveAll();
@@ -153,8 +157,12 @@ public class InteractionListener implements Listener {
                 takeItems(p, shop.getMaterial(), need);
                 shop.addToStash(need);
 
-                Component selled = MiniMessage.miniMessage().deserialize("<#1fff17>Verkauft! -<gray>" + need + "x <white><lang:" + shop.getMaterial().translationKey() + "> <gray>für <#a3ff2b>" + String.format("%.2f€", price));
-                p.sendMessage(Main.prefix().append(selled));
+                Component selled1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
+                Component selled2 = MiniMessage.miniMessage().deserialize("<#ff1717>- <gray>" + need + "x <white><lang:" + shop.getMaterial().translationKey() + ">");
+                Component selled3 = MiniMessage.miniMessage().deserialize("<#a3ff2b>+ " + String.format("%.2f€", price));
+                p.sendMessage(Main.prefix().append(selled1));
+                p.sendMessage(Main.prefix().append(selled2));
+                p.sendMessage(Main.prefix().append(selled3));
                 plugin.entities().updateLabel(shop);
                 try {
                     plugin.storage().saveAll();

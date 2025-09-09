@@ -153,7 +153,7 @@ public class InteractionListener implements Listener {
                 takeItems(p, shop.getMaterial(), need);
                 shop.addToStash(need);
 
-                Component selled = MiniMessage.miniMessage().deserialize("<#1fff17>Verkauft! -<gray>" + need + "x <white><lang:" + shop.getMaterial().translationKey() + "> <grayfür <#a3ff2b>" + String.format("%.2f€", price));
+                Component selled = MiniMessage.miniMessage().deserialize("<#1fff17>Verkauft! -<gray>" + need + "x <white><lang:" + shop.getMaterial().translationKey() + "> <gray>für <#a3ff2b>" + String.format("%.2f€", price));
                 p.sendMessage(Main.prefix().append(selled));
                 plugin.entities().updateLabel(shop);
                 try {

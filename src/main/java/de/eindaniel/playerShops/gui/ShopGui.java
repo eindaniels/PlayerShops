@@ -33,9 +33,9 @@ public class ShopGui {
         if (shop.isBuyEnabled()) {
             ItemStack buy = new ItemStack(Material.LIME_WOOL);
             var bm = buy.getItemMeta();
-            bm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Ankaufen").decoration(TextDecoration.ITALIC,false));
+            bm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Kaufen").decoration(TextDecoration.ITALIC,false));
             bm.lore(List.of(
-                    MiniMessage.miniMessage().deserialize("<gray>Ankaufspreis <dark_gray>→ <#a3ff2b>" + price(getBuyPrice()) + "€").decoration(TextDecoration.ITALIC, false)
+                    MiniMessage.miniMessage().deserialize("<gray>Ankaufspreis <dark_gray>→ <#a3ff2b>" + price(getBuyPrice())).decoration(TextDecoration.ITALIC, false)
             ));
             buy.setItemMeta(bm);
             inv.setItem(11, buy);
@@ -46,7 +46,7 @@ public class ShopGui {
             var sm = sell.getItemMeta();
             sm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufen").decoration(TextDecoration.ITALIC,false));
             sm.lore(List.of(
-                    MiniMessage.miniMessage().deserialize("<gray>Verkaufspreis <dark_gray>→ <#a3ff2b>" + price(shop.getSellPrice()) + "€").decoration(TextDecoration.ITALIC,false)
+                    MiniMessage.miniMessage().deserialize("<gray>Verkaufspreis <dark_gray>→ <#a3ff2b>" + price(shop.getSellPrice())).decoration(TextDecoration.ITALIC,false)
             ));
             sell.setItemMeta(sm);
             inv.setItem(15, sell);

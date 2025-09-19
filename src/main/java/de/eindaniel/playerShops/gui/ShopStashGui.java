@@ -2,6 +2,7 @@ package de.eindaniel.playerShops.gui;
 
 import de.eindaniel.playerShops.Main;
 import de.eindaniel.playerShops.shop.PlayerShop;
+import de.eindaniel.playerShops.util.GuiTitleUtil;
 import de.eindaniel.playerShops.util.ItemSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -29,7 +30,7 @@ public class ShopStashGui {
     }
 
     public Inventory build() {
-        Inventory inv = Bukkit.createInventory(null, 45, Component.text(TITLE));
+        Inventory inv = GuiTitleUtil.createCenteredInventory(45, TITLE);
 
         int idx = 0;
         for (ItemStack is : shop.getStashItems()) {
@@ -110,7 +111,9 @@ public class ShopStashGui {
     }
 
     public static boolean isStash(Component title) {
-        return title != null && Component.text(TITLE).equals(title);
+        if (title == null) return false;
+        String raw = GuiTitleUtil.getRawTitle(title); // entfernt Padding
+        return raw.contains(TITLE);
     }
 
     private String fmt(double v) { return String.format("%.2f€", v); }

@@ -1,6 +1,7 @@
 package de.eindaniel.playerShops.gui;
 
 import de.eindaniel.playerShops.shop.PlayerShop;
+import de.eindaniel.playerShops.util.GuiTitleUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -22,7 +23,7 @@ public class ShopGui {
     }
 
     public Inventory build() {
-        Inventory inv = Bukkit.createInventory(null, 27, Component.text(TITLE));
+        Inventory inv = GuiTitleUtil.createCenteredInventory(27, TITLE);
 
         ItemStack core = new ItemStack(shop.getMaterial(), 1);
         var cm = core.getItemMeta();
@@ -64,6 +65,8 @@ public class ShopGui {
     public PlayerShop getShop() { return shop; }
 
     public static boolean isShop(Component title) {
-        return title != null && Component.text(TITLE).equals(title);
+        if (title == null) return false;
+        String raw = GuiTitleUtil.getRawTitle(title);
+        return raw.contains(TITLE);
     }
 }

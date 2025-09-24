@@ -7,6 +7,7 @@ import de.eindaniel.playerShops.entity.ShopEntityManager;
 import de.eindaniel.playerShops.listener.ChatInputListener;
 import de.eindaniel.playerShops.listener.InteractionListener;
 import de.eindaniel.playerShops.listener.ProtectionListener;
+import de.eindaniel.playerShops.notifications.NotificationManager;
 import de.eindaniel.playerShops.shop.ShopManager;
 import de.eindaniel.playerShops.shop.ShopStorage;
 import net.kyori.adventure.text.Component;
@@ -23,12 +24,15 @@ public class Main extends JavaPlugin {
     private ShopStorage storage;
     private ShopManager shopManager;
     private ShopEntityManager entityManager;
+    private NotificationManager notificationManager;
 
     public static Main get() { return instance; }
     public VaultHook vault() { return vault; }
     public ShopStorage storage() { return storage; }
     public ShopManager shops() { return shopManager; }
     public ShopEntityManager entities() { return entityManager; }
+    public NotificationManager notifications() { return notificationManager; }
+
 
     @Override
     public void onEnable() {

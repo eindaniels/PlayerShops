@@ -31,11 +31,9 @@ import java.util.UUID;
 public class InteractionListener implements Listener {
 
     private final Main plugin;
-    private final NotificationManager notificationManager;
 
-    public InteractionListener(Main plugin, NotificationManager notificationManager) {
+    public InteractionListener(Main plugin) {
         this.plugin = plugin;
-        this.notificationManager = notificationManager;
     }
 
     @EventHandler
@@ -132,7 +130,7 @@ public class InteractionListener implements Listener {
                 p.sendMessage(Main.prefix().append(bought2));
                 p.sendMessage(Main.prefix().append(bought3));
                 Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat für " + String.format("%.2f", price) + " in einer deiner Shops eingekauft.");
-                notificationManager.notifyShopOwner(shop.getOwner(), msg);
+                plugin.notifications().notifyShopOwner(shop.getOwner(), msg);
                 plugin.entities().updateLabel(shop);
                 try {
                     plugin.storage().saveAll();

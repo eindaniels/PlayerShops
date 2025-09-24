@@ -3,6 +3,7 @@ package de.eindaniel.playerShops.listener;
 import de.eindaniel.playerShops.Main;
 import de.eindaniel.playerShops.gui.ShopGui;
 import de.eindaniel.playerShops.gui.ShopStashGui;
+import de.eindaniel.playerShops.notifications.NotificationManager;
 import de.eindaniel.playerShops.shop.PlayerShop;
 import de.eindaniel.playerShops.util.ChatInputHandler;
 import net.kyori.adventure.text.Component;
@@ -30,9 +31,11 @@ import java.util.UUID;
 public class InteractionListener implements Listener {
 
     private final Main plugin;
+    private final NotificationManager notificationManager;
 
-    public InteractionListener(Main plugin) {
+    public InteractionListener(Main plugin, NotificationManager notificationManager) {
         this.plugin = plugin;
+        this.notificationManager = notificationManager;
     }
 
     @EventHandler
@@ -128,6 +131,8 @@ public class InteractionListener implements Listener {
                 p.sendMessage(Main.prefix().append(bought1));
                 p.sendMessage(Main.prefix().append(bought2));
                 p.sendMessage(Main.prefix().append(bought3));
+                Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat für " + String.format("%.2f", price) + " in einer deiner Shops eingekauft.");
+                notificationManager.notifyShopOwner(shop.getOwner(), msg);
                 plugin.entities().updateLabel(shop);
                 try {
                     plugin.storage().saveAll();
@@ -156,6 +161,7 @@ public class InteractionListener implements Listener {
                 }
                 takeItems(p, shop.getMaterial(), need);
                 shop.addToStash(need);
+
 
                 Component selled1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
                 Component selled2 = MiniMessage.miniMessage().deserialize("<#ff1717>- <gray>" + need + "x <white><lang:" + shop.getMaterial().translationKey() + ">");

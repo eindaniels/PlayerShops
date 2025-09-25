@@ -86,7 +86,21 @@ public class PlayerShop {
 
     public void addToStash(int amount) {
         int left = amount;
+        for (ItemStack is : stashItems) {
+            if (is == null) continue;
+            if (is.getType() != material) continue;
+            int maxAdd = material.getMaxStackSize() - is.getAmount();
+            if (maxAdd > 0) {
+                int add = Math.min(maxAdd, left);
+                is.setAmount(is.getAmount() + add);
+                left -= add;
+                if (left == 0) break;
+            }
+        }
         while (left > 0) {
+            if (stashItems.size() >= 64) {
+                throw new IllegalStateException("Zu viele Stash-Stacks (maximal 64 erlaubt)!");
+            }
             int add = Math.min(left, material.getMaxStackSize());
             stashItems.add(new ItemStack(material, add));
             left -= add;

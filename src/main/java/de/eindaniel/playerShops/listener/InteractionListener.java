@@ -160,7 +160,11 @@ public class InteractionListener implements Listener {
                 Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat in einer deiner Shops " + String.format("%.2f", price) + " erhalten. (Verkauf)");
                 plugin.notifications().notifyShopOwner(shop.getOwner(), msg);
                 takeItems(p, shop.getMaterial(), need);
-                shop.addToStash(need);
+                try {
+                    shop.addToStash(need);
+                } catch (IllegalStateException ex) {
+                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Zu viele Items im Shop-Lager!")));
+                }
 
 
                 Component selled1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");

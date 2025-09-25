@@ -129,7 +129,7 @@ public class InteractionListener implements Listener {
                 p.sendMessage(Main.prefix().append(bought1));
                 p.sendMessage(Main.prefix().append(bought2));
                 p.sendMessage(Main.prefix().append(bought3));
-                Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat für " + String.format("%.2f", price) + " in einer deiner Shops eingekauft.");
+                Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat für " + String.format("%.2f", price) + " in einer deiner Shops eingekauft. (Kauf)");
                 plugin.notifications().notifyShopOwner(shop.getOwner(), msg);
                 plugin.entities().updateLabel(shop);
                 try {
@@ -157,6 +157,8 @@ public class InteractionListener implements Listener {
                     p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Die Auszahlung ist fehlgeschlagen, bitte melde dies einem Entwickler.")));
                     return;
                 }
+                Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat in einer deiner Shops " + String.format("%.2f", price) + " erhalten. (Verkauf)");
+                plugin.notifications().notifyShopOwner(shop.getOwner(), msg);
                 takeItems(p, shop.getMaterial(), need);
                 shop.addToStash(need);
 

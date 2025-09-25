@@ -1,0 +1,5 @@
+# Falls man einen Preis haben möchte, um den /createshop ... Command auszuführen. Standart: 200
+price-playershops: 200
+
+# Falls man nun /removeshop eingibt, erhält man 150 zu seinem Kontostand dazu. Standart: 150
+refund-playershops: 150

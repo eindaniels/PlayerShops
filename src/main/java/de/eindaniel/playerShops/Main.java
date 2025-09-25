@@ -14,6 +14,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
@@ -32,10 +34,12 @@ public class Main extends JavaPlugin {
     public ShopManager shops() { return shopManager; }
     public ShopEntityManager entities() { return entityManager; }
     public NotificationManager notifications() { return notificationManager; }
+    public FileConfiguration config() { return getConfig(); }
 
 
     @Override
     public void onEnable() {
+        saveConfig();
         instance = this;
 
         vault = new VaultHook(this);

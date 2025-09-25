@@ -52,6 +52,17 @@ public class CreateShopCommand extends Command {
         Component targetBlock = MiniMessage.miniMessage().deserialize("<#ff1717>Ziele auf einen Block im Umkreis von 6 Blöcken!");
         if (look == null) { p.sendMessage(Main.prefix().append(targetBlock)); return true; }
 
+        double pricePlayerShop = plugin.getConfig().getDouble("price-playershops");
+        if (pricePlayerShop != -1 ||  pricePlayerShop != 0) {
+            if (!plugin.vault().has(p, plugin.getConfig().getDouble("price-playershops"))) { p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Du hast nicht genug Geld für einen SpielerShop! (" + pricePlayerShop + ")"))); return false; }
+            plugin.vault().withdraw(p, pricePlayerShop);
+            Component transaction = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
+            Component price = MiniMessage.miniMessage().deserialize("<#ff1717>- " + String.format("%.2f€", pricePlayerShop));
+            p.sendMessage(Main.prefix().append(transaction));
+            p.sendMessage(Main.prefix().append(price));
+
+        }
+
         Location base = look.getLocation().add(0.5, 1.0, 0.5);
 
         PlayerShop shop = plugin.shops().create(p, base, hand.getType(), amount, buy, sell);

@@ -26,9 +26,6 @@ tasks {
             github("EssentialsX", "Essentials", "2.21.2", "EssentialsX-2.21.2.jar")
             github("MilkBowl", "Vault", "1.7.3", "Vault.jar")
         }
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion(paper_version)
     }
 }

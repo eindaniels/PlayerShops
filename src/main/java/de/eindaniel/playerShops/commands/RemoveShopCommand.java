@@ -45,6 +45,16 @@ public class RemoveShopCommand extends Command {
             return true;
         }
 
+        double refundPrice = plugin.config().getDouble("refund-playershops");
+
+        if (refundPrice != 0 || refundPrice != -1) {
+            plugin.vault().deposit(p, refundPrice);
+            Component transaction = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich! (Shop-Refund)");
+            Component price = MiniMessage.miniMessage().deserialize("<#ff1717>- " + String.format("%.2f€", refundPrice));
+            p.sendMessage(Main.prefix().append(transaction));
+            p.sendMessage(Main.prefix().append(price));
+        }
+
         plugin.entities().despawnAll(); // einfache Variante: alles weg
         plugin.shops().delete(shop);
         try { plugin.storage().saveAll(); } catch (Exception ignored) {}

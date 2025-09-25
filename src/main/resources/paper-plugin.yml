@@ -7,6 +7,6 @@ authors:
 api-version: '1.21'
 dependencies:
   server:
-    Economy:
+    Vault:
       required: true
       load: BEFORE

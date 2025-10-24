@@ -41,6 +41,7 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         saveConfig();
         instance = this;
+        notificationManager = new NotificationManager(this);
 
         vault = new VaultHook(this);
         if (!vault.hook()) {

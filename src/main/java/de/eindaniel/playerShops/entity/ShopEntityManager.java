@@ -5,6 +5,7 @@ import de.eindaniel.playerShops.shop.PlayerShop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.*;
@@ -55,7 +56,7 @@ public class ShopEntityManager {
         TextDisplay td = base.getWorld().spawn(base.clone().add(0, 0.6, 0), TextDisplay.class, t -> {
             t.setBillboard(Display.Billboard.CENTER);
             t.setBillboard(Display.Billboard.VERTICAL);
-            t.setBackgroundColor(org.bukkit.Color.fromARGB(0,0,0,0));
+            t.setBackgroundColor(Color.fromARGB(0,0,0,0));
             t.setTransformation(new Transformation(
                     new Vector3f(0, 0, 0),
                     new Quaternionf(),

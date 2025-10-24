@@ -27,7 +27,7 @@ public class NotificationManager {
     public void notifyShopOwner(UUID owner, Component message) {
         Player player = Bukkit.getPlayer(owner);
         if (player != null && player.isOnline()) {
-            player.sendMessage(message);
+            player.sendMessage(Main.prefix().append(message));
         } else {
             List<String> messages = config.getStringList(owner.toString());
             messages.add(MiniMessage.miniMessage().serialize(message));

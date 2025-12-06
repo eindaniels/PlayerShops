@@ -121,7 +121,12 @@ public class InteractionListener implements Listener {
                 plugin.vault().deposit(owner, price);
 
                 int taken = shop.takeFromStash(need);
-                p.getInventory().addItem(new ItemStack(shop.getMaterial(), taken));
+
+                ItemStack give = new ItemStack(shop.getMaterial(), taken);
+                var leftover = p.getInventory().addItem(give);
+                if (!leftover.isEmpty()) {
+                    leftover.values().forEach(item -> p.getWorld().dropItemNaturally(p.getLocation(), item));
+                }
 
                 Component bought1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
                 Component bought2 = MiniMessage.miniMessage().deserialize("<#1fff17>+ <gray>" + taken + "x <white><lang:" + shop.getMaterial().translationKey() + ">");
@@ -166,7 +171,6 @@ public class InteractionListener implements Listener {
                     p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Zu viele Items im Shop-Lager!")));
                 }
 
-
                 Component selled1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
                 Component selled2 = MiniMessage.miniMessage().deserialize("<#ff1717>- <gray>" + need + "x <white><lang:" + shop.getMaterial().translationKey() + ">");
                 Component selled3 = MiniMessage.miniMessage().deserialize("<#a3ff2b>+ " + String.format("%.2f€", price));
@@ -182,7 +186,7 @@ public class InteractionListener implements Listener {
             return;
         }
 
-// --- Stash-GUI (Owner) ---
+        // --- Stash-GUI (Owner) ---
         if (ShopStashGui.isStash(e.getView().title())) {
             int slot = e.getRawSlot();
 
@@ -202,11 +206,6 @@ public class InteractionListener implements Listener {
 
                 if (slot == 43) {
                     shop.setSellEnabled(!shop.isSellEnabled());
-//                    p.sendMessage(Main.prefix().append(
-//                            MiniMessage.miniMessage().deserialize("<#fbecab>Verkaufen an Shop: "
-//                                            + (shop.isSellEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert"))
-//                                    .decoration(TextDecoration.ITALIC, false)
-//                    ));
 
                     ItemStack toggleSell = new ItemStack(shop.isSellEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
                     ItemMeta sm = toggleSell.getItemMeta();
@@ -226,11 +225,6 @@ public class InteractionListener implements Listener {
                     }
                 } else if (slot == 44) {
                     shop.setBuyEnabled(!shop.isBuyEnabled());
-//                    p.sendMessage(Main.prefix().append(
-//                            MiniMessage.miniMessage().deserialize("<#fbecab>Kaufen an Shop: "
-//                                            + (shop.isBuyEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert"))
-//                                    .decoration(TextDecoration.ITALIC, false)
-//                    ));
 
                     ItemStack toggleBuy = new ItemStack(shop.isBuyEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
                     ItemMeta bm = toggleBuy.getItemMeta();
@@ -352,7 +346,6 @@ public class InteractionListener implements Listener {
             }
         }
     }
-
 
     private PlayerShop nearestShopToViewer(Player p) {
         return plugin.shops().all().stream()

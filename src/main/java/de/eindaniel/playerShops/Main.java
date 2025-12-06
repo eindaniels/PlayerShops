@@ -8,6 +8,7 @@ import de.eindaniel.playerShops.listener.ChatInputListener;
 import de.eindaniel.playerShops.listener.InteractionListener;
 import de.eindaniel.playerShops.listener.ProtectionListener;
 import de.eindaniel.playerShops.notifications.NotificationManager;
+import de.eindaniel.playerShops.notifications.PlayerJoinListener;
 import de.eindaniel.playerShops.shop.ShopManager;
 import de.eindaniel.playerShops.shop.ShopStorage;
 import net.kyori.adventure.text.Component;
@@ -61,6 +62,8 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
         getServer().getPluginManager().registerEvents(new ProtectionListener(), this);
         getServer().getPluginManager().registerEvents(new ChatInputListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(notificationManager), this);
+
         entityManager.spawnAll();
 
         storage.loadAll();

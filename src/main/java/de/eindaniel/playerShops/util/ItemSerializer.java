@@ -1,11 +1,16 @@
 package de.eindaniel.playerShops.util;
 
+import io.papermc.paper.datacomponent.item.ItemEnchantments;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import java.io.*;
-import java.util.Base64;
+import java.util.*;
 
 public final class ItemSerializer {
 

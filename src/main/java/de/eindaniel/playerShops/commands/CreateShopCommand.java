@@ -30,7 +30,7 @@ public class CreateShopCommand extends Command {
             p.sendMessage(Main.prefix().append(usage));
             return true;
         }
-
+        
         double buy, sell; int amount;
         try {
             buy = Double.parseDouble(args[0]);
@@ -43,6 +43,12 @@ public class CreateShopCommand extends Command {
         }
 
         ItemStack hand = p.getInventory().getItemInMainHand();
+        
+        if (hand.getType().equals(Material.ENCHANTED_BOOK) || hand.getType().equals(Material.POTION) || hand.getType().equals(Material.SPLASH_POTION) || hand.getType().equals(Material.LINGERING_POTION)) {
+            p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Diese Items sind aktuell nicht verfügbar. Wir arbeiten an einem Fix.")));
+            return true;
+        }
+        
         if (hand == null || hand.getType() == Material.AIR) {
             Component holdItem = MiniMessage.miniMessage().deserialize("Halte das Item, was du verkaufen möchtest, in deiner Hand.");
             p.sendMessage(Main.prefix().append(holdItem)); return true;

@@ -30,7 +30,7 @@ public class CreateShopCommand extends Command {
             p.sendMessage(Main.prefix().append(usage));
             return true;
         }
-        
+
         double buy, sell; int amount;
         try {
             buy = Double.parseDouble(args[0]);
@@ -50,7 +50,7 @@ public class CreateShopCommand extends Command {
         }
         
         if (hand == null || hand.getType() == Material.AIR) {
-            Component holdItem = MiniMessage.miniMessage().deserialize("Halte das Item, was du verkaufen möchtest, in deiner Hand.");
+            Component holdItem = MiniMessage.miniMessage().deserialize("<gray>Halte das Item, was du verkaufen möchtest, in deiner Hand.");
             p.sendMessage(Main.prefix().append(holdItem)); return true;
         }
 

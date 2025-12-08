@@ -46,6 +46,7 @@ public class Main extends JavaPlugin {
 
         vault = new VaultHook(this);
         if (!vault.hook()) {
+            // TODO -> Check ob "useVault" true ist -> dann deaktivieren. Falls nicht nutze "currency" Feld in der Config als Item.
             getLogger().severe("Vault oder Economy fehlt. Deaktiviere Plugin.");
             getServer().getPluginManager().disablePlugin(this);
             return;

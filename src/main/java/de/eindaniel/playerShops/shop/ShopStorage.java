@@ -167,7 +167,6 @@ public class ShopStorage {
 
         try {
             yaml.save(file);
-            plugin.getLogger().info("Gespeichert: " + plugin.shops().all().size() + " PlayerShops.");
         } catch (IOException e) {
             plugin.getLogger().severe("Fehler beim Speichern der Shops: " + e.getMessage());
             e.printStackTrace();

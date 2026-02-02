@@ -27,7 +27,7 @@ public class ShopGui {
 
         ItemStack core = shop.getDisplayItem();
         var cm = core.getItemMeta();
-        cm.displayName(MiniMessage.miniMessage().deserialize("<gray>" + shop.getAmountPerTrade() + "x <white><lang:" + shop.getDisplayItem().translationKey() + ">"));
+        cm.displayName(MiniMessage.miniMessage().deserialize("<gray>" + shop.getAmountPerTrade() + "x <reset><lang:" + shop.getDisplayItem().translationKey() + ">"));
         core.setItemMeta(cm);
         inv.setItem(13, core);
 

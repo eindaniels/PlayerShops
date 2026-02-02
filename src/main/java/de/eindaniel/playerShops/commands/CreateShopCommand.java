@@ -44,10 +44,10 @@ public class CreateShopCommand extends Command {
 
         ItemStack hand = p.getInventory().getItemInMainHand();
         
-        if (hand.getType().equals(Material.ENCHANTED_BOOK) || hand.getType().equals(Material.POTION) || hand.getType().equals(Material.SPLASH_POTION) || hand.getType().equals(Material.LINGERING_POTION)) {
-            p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Diese Items sind aktuell nicht verfügbar. Wir arbeiten an einem Fix.")));
-            return true;
-        }
+//        if (hand.getType().equals(Material.ENCHANTED_BOOK) || hand.getType().equals(Material.POTION) || hand.getType().equals(Material.SPLASH_POTION) || hand.getType().equals(Material.LINGERING_POTION)) {
+//            p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Diese Items sind aktuell nicht verfügbar. Wir arbeiten an einem Fix.")));
+//            return true;
+//        }
         
         if (hand == null || hand.getType() == Material.AIR) {
             Component holdItem = MiniMessage.miniMessage().deserialize("<gray>Halte das Item, was du verkaufen möchtest, in deiner Hand.");
@@ -71,7 +71,7 @@ public class CreateShopCommand extends Command {
 
         Location base = look.getLocation().add(0.5, 1.0, 0.5);
 
-        PlayerShop shop = plugin.shops().create(p, base, hand.getType(), amount, buy, sell);
+        PlayerShop shop = plugin.shops().create(p, base, hand.clone(), amount, buy, sell);
         plugin.entities().spawnFor(shop);
         try { plugin.storage().saveAll(); } catch (Exception ignored) {}
 

@@ -122,14 +122,15 @@ public class InteractionListener implements Listener {
 
                 int taken = shop.takeFromStash(need);
 
-                ItemStack give = new ItemStack(shop.getMaterial(), taken);
+                ItemStack give = shop.getDisplayItem();
+                give.setAmount(taken);
                 var leftover = p.getInventory().addItem(give);
                 if (!leftover.isEmpty()) {
                     leftover.values().forEach(item -> p.getWorld().dropItemNaturally(p.getLocation(), item));
                 }
 
                 Component bought1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
-                Component bought2 = MiniMessage.miniMessage().deserialize("<#1fff17>+ <gray>" + taken + "x <white><lang:" + shop.getMaterial().translationKey() + ">");
+                Component bought2 = MiniMessage.miniMessage().deserialize("<#1fff17>+ <gray>" + taken + "x <white><lang:" + shop.getDisplayItem().translationKey() + ">");
                 Component bought3 = MiniMessage.miniMessage().deserialize("<#ff1717>- <#a3ff2b>" + String.format("%.2f€", price));
                 p.sendMessage(Main.prefix().append(bought1));
                 p.sendMessage(Main.prefix().append(bought2));
@@ -143,8 +144,8 @@ public class InteractionListener implements Listener {
                 }
             } else if (slot == 15 && shop.isSellEnabled()) {
                 int need = shop.getAmountPerTrade();
-                if (!hasItems(p, shop.getMaterial(), need)) {
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Du hast nicht genug <lang:" + shop.getMaterial().translationKey() + ">.")));
+                if (!hasItems(p, shop.getDisplayItem(), need)) {
+                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Du hast nicht genug <lang:" + shop.getDisplayItem().translationKey() + ">.")));
                     return;
                 }
                 double price = shop.getSellPrice();
@@ -164,7 +165,7 @@ public class InteractionListener implements Listener {
                 }
                 Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat in einer deiner Shops " + String.format("%.2f", price) + "€ erhalten. (Verkauf)");
                 plugin.notifications().notifyShopOwner(shop.getOwner(), msg);
-                takeItems(p, shop.getMaterial(), need);
+                takeItems(p, shop.getDisplayItem(), need);
                 try {
                     shop.addToStash(need);
                 } catch (IllegalStateException ex) {
@@ -172,7 +173,7 @@ public class InteractionListener implements Listener {
                 }
 
                 Component selled1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
-                Component selled2 = MiniMessage.miniMessage().deserialize("<#ff1717>- <gray>" + need + "x <white><lang:" + shop.getMaterial().translationKey() + ">");
+                Component selled2 = MiniMessage.miniMessage().deserialize("<#ff1717>- <gray>" + need + "x <white><lang:" + shop.getDisplayItem().translationKey() + ">");
                 Component selled3 = MiniMessage.miniMessage().deserialize("<#a3ff2b>+ " + String.format("%.2f€", price));
                 p.sendMessage(Main.prefix().append(selled1));
                 p.sendMessage(Main.prefix().append(selled2));
@@ -355,21 +356,21 @@ public class InteractionListener implements Listener {
                 .orElse(null);
     }
 
-    private boolean hasItems(Player p, Material mat, int amount) {
+    private boolean hasItems(Player p, ItemStack itemStack, int amount) {
         int count = 0;
         for (ItemStack is : p.getInventory().getStorageContents()) {
-            if (is != null && is.getType() == mat) count += is.getAmount();
+            if (is != null && is.isSimilar(itemStack)) count += is.getAmount();
             if (count >= amount) return true;
         }
         return false;
     }
 
-    private void takeItems(Player p, Material mat, int amount) {
+    private void takeItems(Player p, ItemStack itemStack, int amount) {
         int left = amount;
         var inv = p.getInventory();
         for (int i = 0; i < inv.getSize() && left > 0; i++) {
             ItemStack is = inv.getItem(i);
-            if (is == null || is.getType() != mat) continue;
+            if (is == null || !is.isSimilar(itemStack)) continue;
             int take = Math.min(is.getAmount(), left);
             is.setAmount(is.getAmount() - take);
             if (is.getAmount() <= 0) inv.setItem(i, null);

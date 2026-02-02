@@ -54,6 +54,7 @@ public class Main extends JavaPlugin {
 
         storage = new ShopStorage(this);
         shopManager = new ShopManager(this, storage);
+        storage.createBackupIfNeeded();
         entityManager = new ShopEntityManager(this, shopManager);
 
         CommandMap commandMap = Bukkit.getCommandMap();

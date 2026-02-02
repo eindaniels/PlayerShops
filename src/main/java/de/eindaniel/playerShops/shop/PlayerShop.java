@@ -10,8 +10,10 @@ public class PlayerShop {
 
     private final UUID owner;
     private final Location baseLocation;          // Mittelpunkt des Blocks
-    private final Material material;              // Welches Item wird gehandelt
-    private int amountPerTrade;             // Menge
+
+    private ItemStack displayItem;                // Welches Item wird gehandelt (mit NBT!)
+
+    private int amountPerTrade;                   // Menge
     private double buyPrice;                      // Spieler zahlt (Shop verkauft)  -> "Verkauf:"
     private double sellPrice;                     // Spieler bekommt (Shop kauft)   -> "Ankauf:"
 
@@ -20,11 +22,11 @@ public class PlayerShop {
 
     private final List<ItemStack> stashItems = new ArrayList<>();
 
-    public PlayerShop(UUID owner, Location baseLocation, Material material, int amountPerTrade,
+    public PlayerShop(UUID owner, Location baseLocation, ItemStack displayItem, int amountPerTrade,
                       double buyPrice, double sellPrice) {
         this.owner = owner;
         this.baseLocation = baseLocation.clone();
-        this.material = material;
+        this.displayItem = displayItem.clone(); // Clone um Referenzprobleme zu vermeiden
         this.amountPerTrade = amountPerTrade;
         this.buyPrice = buyPrice;
         this.sellPrice = sellPrice;
@@ -32,7 +34,12 @@ public class PlayerShop {
 
     public UUID getOwner() { return owner; }
     public Location getBaseLocation() { return baseLocation.clone(); }
-    public Material getMaterial() { return material; }
+
+    public ItemStack getDisplayItem() { return displayItem.clone(); }
+
+    @Deprecated
+    public Material getMaterial() { return displayItem.getType(); }
+
     public int getAmountPerTrade() { return amountPerTrade; }
     public double getBuyPrice() { return buyPrice; }
     public double getSellPrice() { return sellPrice; }
@@ -65,7 +72,9 @@ public class PlayerShop {
         int n = 0;
         for (ItemStack is : stashItems) {
             if (is == null) continue;
-            if (is.getType() == material) n += is.getAmount();
+            if (is.isSimilar(displayItem)) {
+                n += is.getAmount();
+            }
         }
         return n;
     }
@@ -75,7 +84,9 @@ public class PlayerShop {
         for (int i = 0; i < stashItems.size() && left > 0; i++) {
             ItemStack is = stashItems.get(i);
             if (is == null) continue;
-            if (is.getType() != material) continue;
+
+            if (!is.isSimilar(displayItem)) continue;
+
             int take = Math.min(is.getAmount(), left);
             is.setAmount(is.getAmount() - take);
             left -= take;
@@ -86,10 +97,13 @@ public class PlayerShop {
 
     public void addToStash(int amount) {
         int left = amount;
+
         for (ItemStack is : stashItems) {
             if (is == null) continue;
-            if (is.getType() != material) continue;
-            int maxAdd = material.getMaxStackSize() - is.getAmount();
+
+            if (!is.isSimilar(displayItem)) continue;
+
+            int maxAdd = displayItem.getMaxStackSize() - is.getAmount();
             if (maxAdd > 0) {
                 int add = Math.min(maxAdd, left);
                 is.setAmount(is.getAmount() + add);
@@ -97,12 +111,17 @@ public class PlayerShop {
                 if (left == 0) break;
             }
         }
+
         while (left > 0) {
             if (stashItems.size() >= 64) {
                 throw new IllegalStateException("Zu viele Stash-Stacks (maximal 64 erlaubt)!");
             }
-            int add = Math.min(left, material.getMaxStackSize());
-            stashItems.add(new ItemStack(material, add));
+            int add = Math.min(left, displayItem.getMaxStackSize());
+
+            // ✅ Clone das displayItem um NBT-Daten zu übernehmen!
+            ItemStack newStack = displayItem.clone();
+            newStack.setAmount(add);
+            stashItems.add(newStack);
             left -= add;
         }
     }

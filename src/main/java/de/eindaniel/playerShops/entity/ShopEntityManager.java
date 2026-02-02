@@ -41,7 +41,7 @@ public class ShopEntityManager {
         Location base = shop.getBaseLocation().clone();
 
         ItemDisplay bd = base.getWorld().spawn(base.clone().add(0, 0.3, 0), ItemDisplay.class, d -> {
-            d.setItemStack(new ItemStack(shop.getMaterial()));
+            d.setItemStack(shop.getDisplayItem());
             d.setBrightness(new Display.Brightness(15, 15));
             d.setBillboard(Display.Billboard.VERTICAL);
             d.setTransformation(new Transformation(
@@ -120,7 +120,7 @@ public class ShopEntityManager {
     }
 
     private net.kyori.adventure.text.Component label(PlayerShop shop) {
-        String item = shop.getMaterial().translationKey();
+        String item = shop.getDisplayItem().translationKey();
         return MiniMessage.miniMessage().deserialize("<gray>" + shop.getAmountPerTrade() + "x <white><lang:" + item + ">\n" + (shop.isBuyEnabled() ? "<#fbecab>Verkauf: <#a3ff2b>" + shop.getBuyPrice() + "€" : "<#ff1717><st>Verkauf: " + shop.getBuyPrice() + "€<reset>") + "\n" + (shop.isSellEnabled() ? "<#fbecab>Ankauf: <#a3ff2b>" + shop.getSellPrice() + "€" : "<#ff1717><st>Ankauf: " + shop.getSellPrice() + "€<reset>"));
     }
 

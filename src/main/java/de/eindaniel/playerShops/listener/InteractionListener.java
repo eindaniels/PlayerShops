@@ -370,7 +370,7 @@ public class InteractionListener implements Listener {
         var inv = p.getInventory();
         for (int i = 0; i < inv.getSize() && left > 0; i++) {
             ItemStack is = inv.getItem(i);
-            if (is == null || is.isSimilar(itemStack)) continue;
+            if (is == null || !is.isSimilar(itemStack)) continue;
             int take = Math.min(is.getAmount(), left);
             is.setAmount(is.getAmount() - take);
             if (is.getAmount() <= 0) inv.setItem(i, null);

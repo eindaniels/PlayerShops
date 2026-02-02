@@ -118,7 +118,6 @@ public class PlayerShop {
             }
             int add = Math.min(left, displayItem.getMaxStackSize());
 
-            // ✅ Clone das displayItem um NBT-Daten zu übernehmen!
             ItemStack newStack = displayItem.clone();
             newStack.setAmount(add);
             stashItems.add(newStack);

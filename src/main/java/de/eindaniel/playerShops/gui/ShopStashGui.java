@@ -125,7 +125,7 @@ public class ShopStashGui {
             ItemStack is = inv.getItem(i);
             if (is == null || is.getType() == Material.AIR) continue;
 
-            if (is.getType() != shop.getMaterial()) {
+            if (is.isSimilar(shop.getDisplayItem())) {
                 var leftover = player.getInventory().addItem(is.clone());
                 leftover.values().forEach(item ->
                         player.getWorld().dropItemNaturally(player.getLocation(), item)

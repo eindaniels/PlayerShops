@@ -25,9 +25,9 @@ public class ShopGui {
     public Inventory build() {
         Inventory inv = GuiTitleUtil.createCenteredInventory(27, TITLE);
 
-        ItemStack core = new ItemStack(shop.getMaterial(), 1);
+        ItemStack core = shop.getDisplayItem();
         var cm = core.getItemMeta();
-        cm.displayName(MiniMessage.miniMessage().deserialize("<gray>" + shop.getAmountPerTrade() + "x <white><lang:" + shop.getMaterial().translationKey() + ">"));
+        cm.displayName(MiniMessage.miniMessage().deserialize("<gray>" + shop.getAmountPerTrade() + "x <white><lang:" + shop.getDisplayItem().translationKey() + ">"));
         core.setItemMeta(cm);
         inv.setItem(13, core);
 

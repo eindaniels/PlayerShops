@@ -4,7 +4,9 @@ import de.eindaniel.playerShops.Main;
 import de.eindaniel.playerShops.entity.ShopEntityManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -23,9 +25,9 @@ public class ShopManager {
     public Optional<PlayerShop> getByKey(String key) { return Optional.ofNullable(shops.get(key)); }
     public Collection<PlayerShop> all() { return Collections.unmodifiableCollection(shops.values()); }
 
-    public PlayerShop create(Player owner, Location base, Material mat, int amountPerTrade,
+    public PlayerShop create(Player owner, Location base, ItemStack itemStack, int amountPerTrade,
                              double buyPrice, double sellPrice) {
-        PlayerShop shop = new PlayerShop(owner.getUniqueId(), base, mat, amountPerTrade, buyPrice, sellPrice);
+        PlayerShop shop = new PlayerShop(owner.getUniqueId(), base, itemStack, amountPerTrade, buyPrice, sellPrice);
         shops.put(shop.key(), shop);
         return shop;
     }

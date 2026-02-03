@@ -158,6 +158,12 @@ public class InteractionListener implements Listener {
                     p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Der Shop-Besitzer hat nicht genug Geld!")));
                     return;
                 }
+                try {
+                    shop.addToStash(need);
+                } catch (IllegalStateException | StashFullException ex) {
+                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Zu viele Items im Shop-Lager!")));
+                    return;
+                }
                 if (!plugin.vault().withdraw(owner, price)) {
                     p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Die Auszahlung ist fehlgeschlagen, bitte melde dies einem Entwickler.")));
                     return;
@@ -170,12 +176,6 @@ public class InteractionListener implements Listener {
                 Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat in einer deiner Shops " + String.format("%.2f", price) + "€ erhalten. (Verkauf)");
                 plugin.notifications().notifyShopOwner(shop.getOwner(), msg);
                 takeItems(p, shop.getDisplayItem(), need);
-                try {
-                    shop.addToStash(need);
-                } catch (IllegalStateException | StashFullException ex) {
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Zu viele Items im Shop-Lager!")));
-                    return;
-                }
 
                 Component selled1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
                 Component selled2 = MiniMessage.miniMessage().deserialize("<#ff1717>- <gray>" + need + "x <white><lang:" + shop.getDisplayItem().translationKey() + ">");

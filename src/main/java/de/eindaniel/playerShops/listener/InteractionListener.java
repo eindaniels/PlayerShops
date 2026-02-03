@@ -174,6 +174,7 @@ public class InteractionListener implements Listener {
                     shop.addToStash(need);
                 } catch (IllegalStateException | StashFullException ex) {
                     p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Zu viele Items im Shop-Lager!")));
+                    return;
                 }
 
                 Component selled1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");

@@ -32,7 +32,7 @@ public class PlayerShop {
     private UUID itemDisplayUUID;                 // same as above
     private UUID interactionUUID;                 // JAAA
 
-    private static final int MAX_STASH_SLOTS = 64;// Selbsterklärend.
+    private static final int MAX_STASH_SLOTS = 36;// Selbsterklärend.
 
 
     private final List<ItemStack> stashItems = new ArrayList<>();

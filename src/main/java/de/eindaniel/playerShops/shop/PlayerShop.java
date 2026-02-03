@@ -1,7 +1,14 @@
 package de.eindaniel.playerShops.shop;
 
+import de.eindaniel.playerShops.Main;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Interaction;
+import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -19,6 +26,11 @@ public class PlayerShop {
 
     private boolean buyEnabled = true;            // Kaufen (Shop verkauft an Spieler)
     private boolean sellEnabled = true;           // Verkaufen (Shop kauft vom Spieler)
+
+    private UUID textDisplayUUID;                 // ID vom TextDisplay, fürs löschen.
+    private UUID itemDisplayUUID;                 // same as above
+    private UUID interactionUUID;                 // JAAA
+
 
     private final List<ItemStack> stashItems = new ArrayList<>();
 
@@ -50,6 +62,14 @@ public class PlayerShop {
     public void setSellEnabled(boolean b) { this.sellEnabled = b; }
 
     public List<ItemStack> getStashItems() { return stashItems; }
+
+    public UUID getTextDisplayUUID() { return textDisplayUUID; }
+    public UUID getItemDisplayUUID() { return itemDisplayUUID; }
+    public UUID getInteractionUUID() { return interactionUUID; }
+
+    public void setTextDisplayUUID(UUID uuid) { this.textDisplayUUID = uuid; }
+    public void setItemDisplayUUID(UUID uuid) { this.itemDisplayUUID = uuid; }
+    public void setInteractionUUID(UUID uuid) { this.interactionUUID = uuid; }
 
     public String key() {
         return baseLocation.getWorld().getName() + ":" +
@@ -123,5 +143,42 @@ public class PlayerShop {
             stashItems.add(newStack);
             left -= add;
         }
+    }
+
+    /**
+     * Entfernt alle Display-Entities des Shops
+     */
+    public void removeDisplays() {
+        World world = baseLocation.getWorld();
+        if (world == null) return;
+
+        if (textDisplayUUID != null) {
+            Entity entity = Bukkit.getEntity(textDisplayUUID);
+            if (entity != null && entity instanceof TextDisplay) {
+                entity.remove();
+            }
+        }
+
+        if (itemDisplayUUID != null) {
+            Entity entity = Bukkit.getEntity(itemDisplayUUID);
+            if (entity != null && entity instanceof ItemDisplay) {
+                entity.remove();
+            }
+        }
+
+        if (interactionUUID != null) {
+            Entity entity = Bukkit.getEntity(interactionUUID);
+            if (entity != null && entity instanceof Interaction) {
+                entity.remove();
+            }
+        }
+    }
+
+    /**
+     * Updated Display (entfernt altes, spawnt neues)
+     */
+    public void updateDisplay() {
+        removeDisplays();
+        Main.get().entities().spawnFor(this);
     }
 }

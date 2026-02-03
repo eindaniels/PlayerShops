@@ -1,6 +1,7 @@
 package de.eindaniel.playerShops.listener;
 
 import de.eindaniel.playerShops.Main;
+import de.eindaniel.playerShops.entity.ShopEntityManager;
 import de.eindaniel.playerShops.gui.ShopGui;
 import de.eindaniel.playerShops.gui.ShopStashGui;
 import de.eindaniel.playerShops.notifications.NotificationManager;
@@ -76,6 +77,7 @@ public class InteractionListener implements Listener {
         ShopStashGui.saveBack(shop, e.getInventory(), p);
 
         plugin.entities().updateLabel(shop);
+        shop.updateDisplay();
         try {
             plugin.storage().saveAll();
         } catch (Exception ignored) {}
@@ -138,6 +140,7 @@ public class InteractionListener implements Listener {
                 Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat für " + String.format("%.2f", price) + "€ in einer deiner Shops eingekauft. (Kauf)");
                 plugin.notifications().notifyShopOwner(shop.getOwner(), msg);
                 plugin.entities().updateLabel(shop);
+                shop.updateDisplay();
                 try {
                     plugin.storage().saveAll();
                 } catch (Exception ignored) {
@@ -179,6 +182,7 @@ public class InteractionListener implements Listener {
                 p.sendMessage(Main.prefix().append(selled2));
                 p.sendMessage(Main.prefix().append(selled3));
                 plugin.entities().updateLabel(shop);
+                shop.updateDisplay();
                 try {
                     plugin.storage().saveAll();
                 } catch (Exception ignored) {
@@ -220,6 +224,7 @@ public class InteractionListener implements Listener {
                     e.getInventory().setItem(43, toggleSell);
 
                     plugin.entities().updateLabel(shop);
+                    shop.updateDisplay();
                     try {
                         plugin.storage().saveAll();
                     } catch (Exception ignored) {
@@ -239,6 +244,7 @@ public class InteractionListener implements Listener {
                     e.getInventory().setItem(44, toggleBuy);
 
                     plugin.entities().updateLabel(shop);
+                    shop.updateDisplay();
                     try {
                         plugin.storage().saveAll();
                     } catch (Exception ignored) {
@@ -265,6 +271,7 @@ public class InteractionListener implements Listener {
                             shop.setSellPrice(price);
                             p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#a3ff2b>Verkaufspreis geändert zu <dark_gray>→ <#a3ff2b>" + price)));
                             plugin.entities().updateLabel(shop);
+                            shop.updateDisplay();
                             try {
                                 plugin.storage().saveAll();
                             } catch (Exception ignored) {
@@ -296,6 +303,7 @@ public class InteractionListener implements Listener {
                                         "<#a3ff2b>Ankaufspreis geändert zu <dark_gray>→ <#a3ff2b>" + price)));
 
                                 plugin.entities().updateLabel(shop);
+                                shop.updateDisplay();
                                 try {
                                     plugin.storage().saveAll();
                                 } catch (Exception ignored) {}
@@ -327,6 +335,7 @@ public class InteractionListener implements Listener {
                                         "<#a3ff2b>Verkaufsmenge geändert zu <dark_gray>→ <#fbecab>" + amount + "x")));
 
                                 plugin.entities().updateLabel(shop);
+                                shop.updateDisplay();
                                 try {
                                     plugin.storage().saveAll();
                                 } catch (Exception ignored) {}

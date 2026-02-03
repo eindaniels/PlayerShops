@@ -53,6 +53,8 @@ public class ShopEntityManager {
             tag(d.getPersistentDataContainer(), shop.key());
         });
 
+        shop.setItemDisplayUUID(bd.getUniqueId());
+
         TextDisplay td = base.getWorld().spawn(base.clone().add(0, 0.6, 0), TextDisplay.class, t -> {
             t.setBillboard(Display.Billboard.CENTER);
             t.setBillboard(Display.Billboard.VERTICAL);
@@ -67,12 +69,16 @@ public class ShopEntityManager {
             tag(t.getPersistentDataContainer(), shop.key());
         });
 
+        shop.setTextDisplayUUID(td.getUniqueId());
+
         Interaction it = base.getWorld().spawn(base.clone().add(0, 0, 0), Interaction.class, i -> {
             i.setInteractionWidth(1.4f);
             i.setInteractionHeight(1.4f);
             i.setResponsive(true);
             tag(i.getPersistentDataContainer(), shop.key());
         });
+
+        shop.setInteractionUUID(it.getUniqueId());
 
         blockIds.put(shop.key(), bd.getUniqueId());
         textIds.put(shop.key(), td.getUniqueId());

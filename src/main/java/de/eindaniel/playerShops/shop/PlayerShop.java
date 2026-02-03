@@ -1,6 +1,7 @@
 package de.eindaniel.playerShops.shop;
 
 import de.eindaniel.playerShops.Main;
+import de.eindaniel.playerShops.exceptions.StashFullException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +31,8 @@ public class PlayerShop {
     private UUID textDisplayUUID;                 // ID vom TextDisplay, fürs löschen.
     private UUID itemDisplayUUID;                 // same as above
     private UUID interactionUUID;                 // JAAA
+
+    private static final int MAX_STASH_SLOTS = 64;// Selbsterklärend.
 
 
     private final List<ItemStack> stashItems = new ArrayList<>();
@@ -115,9 +118,12 @@ public class PlayerShop {
         return amount - left;
     }
 
-    public void addToStash(int amount) {
+    public void addToStash(int amount) throws StashFullException {
         int left = amount;
 
+        if (!hasStashSpace(amount)) {
+            throw new StashFullException("Stash ist voll! Maximal " + MAX_STASH_SLOTS + " Slots erlaubt.");
+        }
         for (ItemStack is : stashItems) {
             if (is == null) continue;
 
@@ -145,9 +151,6 @@ public class PlayerShop {
         }
     }
 
-    /**
-     * Entfernt alle Display-Entities des Shops
-     */
     public void removeDisplays() {
         World world = baseLocation.getWorld();
         if (world == null) return;
@@ -174,11 +177,59 @@ public class PlayerShop {
         }
     }
 
-    /**
-     * Updated Display (entfernt altes, spawnt neues)
-     */
     public void updateDisplay() {
         removeDisplays();
         Main.get().entities().spawnFor(this);
+    }
+
+    public boolean hasStashSpace(int amount) {
+        int usedSlots = 0;
+        int availableSpace = 0;
+
+        for (ItemStack item : stashItems) {
+            if (item == null || item.getType().isAir()) continue;
+            usedSlots++;
+
+            if (item.isSimilar(displayItem)) {
+                availableSpace += displayItem.getMaxStackSize() - item.getAmount();
+            }
+        }
+
+        int remainingAmount = amount - availableSpace;
+        int neededSlots = 0;
+
+        if (remainingAmount > 0) {
+            neededSlots = (int) Math.ceil((double) remainingAmount / displayItem.getMaxStackSize());
+        }
+
+        int freeSlots = MAX_STASH_SLOTS - usedSlots;
+        return neededSlots <= freeSlots;
+    }
+
+    public int getMaxAddableAmount() {
+        int availableInExisting = 0;
+        int usedSlots = 0;
+
+        for (ItemStack item : stashItems) {
+            if (item == null || item.getType().isAir()) continue;
+            usedSlots++;
+
+            if (item.isSimilar(displayItem)) {
+                availableInExisting += displayItem.getMaxStackSize() - item.getAmount();
+            }
+        }
+
+        int freeSlots = MAX_STASH_SLOTS - usedSlots;
+        return availableInExisting + (freeSlots * displayItem.getMaxStackSize());
+    }
+
+    public int getFreeStashSlots() {
+        int usedSlots = 0;
+        for (ItemStack item : stashItems) {
+            if (item != null && !item.getType().isAir()) {
+                usedSlots++;
+            }
+        }
+        return MAX_STASH_SLOTS - usedSlots;
     }
 }

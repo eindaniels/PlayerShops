@@ -2,6 +2,7 @@ package de.eindaniel.playerShops.listener;
 
 import de.eindaniel.playerShops.Main;
 import de.eindaniel.playerShops.entity.ShopEntityManager;
+import de.eindaniel.playerShops.exceptions.StashFullException;
 import de.eindaniel.playerShops.gui.ShopGui;
 import de.eindaniel.playerShops.gui.ShopStashGui;
 import de.eindaniel.playerShops.notifications.NotificationManager;
@@ -171,7 +172,7 @@ public class InteractionListener implements Listener {
                 takeItems(p, shop.getDisplayItem(), need);
                 try {
                     shop.addToStash(need);
-                } catch (IllegalStateException ex) {
+                } catch (IllegalStateException | StashFullException ex) {
                     p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Zu viele Items im Shop-Lager!")));
                 }
 

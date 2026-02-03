@@ -59,6 +59,7 @@ public class ShopEntityManager {
             t.setBillboard(Display.Billboard.CENTER);
             t.setBillboard(Display.Billboard.VERTICAL);
             t.setBackgroundColor(Color.fromARGB(0,0,0,0));
+            t.setShadowed(true);
             t.setTransformation(new Transformation(
                     new Vector3f(0, 0, 0),
                     new Quaternionf(),

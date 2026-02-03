@@ -108,6 +108,14 @@ public class ShopStorage {
                 }
             }
 
+            String textUUID = sec.getString("textDisplayUUID");
+            String itemUUID = sec.getString("itemDisplayUUID");
+            String interUUID = sec.getString("interactionUUID");
+
+            if (textUUID != null) shop.setTextDisplayUUID(UUID.fromString(textUUID));
+            if (itemUUID != null) shop.setItemDisplayUUID(UUID.fromString(itemUUID));
+            if (interUUID != null) shop.setInteractionUUID(UUID.fromString(interUUID));
+
             plugin.shops().put(shop);
             loaded++;
 
@@ -163,6 +171,15 @@ public class ShopStorage {
                 }
             }
             yaml.set(path + ".stashItems", stashEncoded);
+            if (shop.getTextDisplayUUID() != null) {
+                yaml.set(path + ".textDisplayUUID", shop.getTextDisplayUUID().toString());
+            }
+            if (shop.getItemDisplayUUID() != null) {
+                yaml.set(path + ".itemDisplayUUID", shop.getItemDisplayUUID().toString());
+            }
+            if (shop.getInteractionUUID() != null) {
+                yaml.set(path + ".interactionUUID", shop.getInteractionUUID().toString());
+            }
         }
 
         try {

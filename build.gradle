@@ -18,6 +18,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:$paper_version-R0.1-SNAPSHOT")
     compileOnly "com.github.MilkBowl:VaultAPI:$vault_version"
+    compileOnly "com.github.cytooxien:realms-api:$realms_api_version"
 }
 
 tasks {

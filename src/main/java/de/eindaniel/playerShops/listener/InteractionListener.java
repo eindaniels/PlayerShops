@@ -40,6 +40,7 @@ public class InteractionListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEntityEvent e) {
+        // TODO Translations
         if (!(e.getRightClicked() instanceof Interaction it)) return;
 
         Optional<String> keyOpt = plugin.entities().readKey(it.getPersistentDataContainer());
@@ -56,14 +57,14 @@ public class InteractionListener implements Listener {
             ShopStashGui gui = new ShopStashGui(plugin, shop);
             gui.openFor(p);
         } else {
-            Inventory inv = new ShopGui(shop).build();
+            Inventory inv = new ShopGui(shop).build(p);
             p.openInventory(inv);
         }
     }
 
     @EventHandler
     public void onClose(InventoryCloseEvent e) {
-        if (!ShopStashGui.isStash(e.getView().title())) return;
+        if (!ShopStashGui.isStash(e.getView().title(), (Player) e.getPlayer())) return;
 
         Player p = (Player) e.getPlayer();
 
@@ -89,7 +90,7 @@ public class InteractionListener implements Listener {
         if (!(e.getWhoClicked() instanceof Player p)) return;
 
         // --- Shop-GUI (Kauf/Verkauf) ---
-        if (ShopGui.isShop(e.getView().title())) {
+        if (ShopGui.isShop(e.getView().title(), p)) {
             e.setCancelled(true);
 
             PlayerShop shop = nearestShopToViewer(p);
@@ -194,7 +195,7 @@ public class InteractionListener implements Listener {
         }
 
         // --- Stash-GUI (Owner) ---
-        if (ShopStashGui.isStash(e.getView().title())) {
+        if (ShopStashGui.isStash(e.getView().title(), p)) {
             int slot = e.getRawSlot();
 
             // --- Toggle verkaufen/kaufen ---

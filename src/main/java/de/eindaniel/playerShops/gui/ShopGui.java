@@ -2,6 +2,8 @@ package de.eindaniel.playerShops.gui;
 
 import de.eindaniel.playerShops.shop.PlayerShop;
 import de.eindaniel.playerShops.util.GuiTitleUtil;
+import de.eindaniel.playerShops.util.MessageUtils;
+import de.eindaniel.playerShops.util.MessageUtilsSingleton;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -14,29 +16,28 @@ import java.util.List;
 
 public class ShopGui {
 
-    public static final String TITLE = "Kauf abschließen";
-
     private final PlayerShop shop;
 
     public ShopGui(PlayerShop shop) {
         this.shop = shop;
     }
 
-    public Inventory build() {
-        Inventory inv = GuiTitleUtil.createCenteredInventory(27, TITLE);
+    public Inventory build(Player player) {
+        MessageUtils messageUtils = MessageUtilsSingleton.getInstance();
+        Inventory inv = GuiTitleUtil.createCenteredInventory(27, messageUtils.getLocalizedMessageStringNoPrefix(player, "shopGui.title"));
 
         ItemStack core = shop.getDisplayItem();
         var cm = core.getItemMeta();
-        cm.displayName(MiniMessage.miniMessage().deserialize("<gray>" + shop.getAmountPerTrade() + "x <reset><lang:" + shop.getDisplayItem().translationKey() + ">").decoration(TextDecoration.ITALIC, false));
+        cm.displayName(messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopGui.selledItem", shop.getAmountPerTrade(), shop.getDisplayItem().translationKey()).decoration(TextDecoration.ITALIC, false));
         core.setItemMeta(cm);
         inv.setItem(13, core);
 
         if (shop.isBuyEnabled()) {
             ItemStack buy = new ItemStack(Material.LIME_WOOL);
             var bm = buy.getItemMeta();
-            bm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Kaufen").decoration(TextDecoration.ITALIC,false));
+            bm.displayName(messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopGui.buyItem.title").decoration(TextDecoration.ITALIC,false));
             bm.lore(List.of(
-                    MiniMessage.miniMessage().deserialize("<gray>Ankaufspreis <dark_gray>→ <#a3ff2b>" + price(getBuyPrice())).decoration(TextDecoration.ITALIC, false)
+                    messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopGui.buyItem.lore", price(shop.getBuyPrice())).decoration(TextDecoration.ITALIC, false)
             ));
             buy.setItemMeta(bm);
             inv.setItem(11, buy);
@@ -45,9 +46,9 @@ public class ShopGui {
         if (shop.isSellEnabled()) {
             ItemStack sell = new ItemStack(Material.RED_WOOL);
             var sm = sell.getItemMeta();
-            sm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufen").decoration(TextDecoration.ITALIC,false));
+            sm.displayName(messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopGui.sellItem.title").decoration(TextDecoration.ITALIC,false));
             sm.lore(List.of(
-                    MiniMessage.miniMessage().deserialize("<gray>Verkaufspreis <dark_gray>→ <#a3ff2b>" + price(shop.getSellPrice())).decoration(TextDecoration.ITALIC,false)
+                    messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopGui.sellItem.lore", price(shop.getSellPrice())).decoration(TextDecoration.ITALIC,false)
             ));
             sell.setItemMeta(sm);
             inv.setItem(15, sell);
@@ -64,9 +65,10 @@ public class ShopGui {
 
     public PlayerShop getShop() { return shop; }
 
-    public static boolean isShop(Component title) {
+    public static boolean isShop(Component title, Player player) {
         if (title == null) return false;
         String raw = GuiTitleUtil.getRawTitle(title);
-        return raw.contains(TITLE);
+        MessageUtils messageUtils = MessageUtilsSingleton.getInstance();
+        return raw.contains(messageUtils.getLocalizedMessageStringNoPrefix(player, "shopGui.title"));
     }
 }

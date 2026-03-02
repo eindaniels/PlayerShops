@@ -1,9 +1,12 @@
 package de.eindaniel.playerShops.gui;
 
+import com.mojang.brigadier.Message;
 import de.eindaniel.playerShops.Main;
 import de.eindaniel.playerShops.shop.PlayerShop;
 import de.eindaniel.playerShops.util.GuiTitleUtil;
 import de.eindaniel.playerShops.util.ItemSerializer;
+import de.eindaniel.playerShops.util.MessageUtils;
+import de.eindaniel.playerShops.util.MessageUtilsSingleton;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -17,8 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ShopStashGui {
 
-    public static final String TITLE = "Shop Lager";
-
     private final Main plugin;
     private final PlayerShop shop;
 
@@ -29,8 +30,9 @@ public class ShopStashGui {
         this.shop = shop;
     }
 
-    public Inventory build() {
-        Inventory inv = GuiTitleUtil.createCenteredInventory(45, TITLE);
+    public Inventory build(Player player) {
+        MessageUtils messageUtils = MessageUtilsSingleton.getInstance();
+        Inventory inv = GuiTitleUtil.createCenteredInventory(45, messageUtils.getLocalizedMessageStringNoPrefix(player, "shopStashGui.title"));
 
         int idx = 0;
         for (ItemStack is : shop.getStashItems()) {
@@ -41,45 +43,45 @@ public class ShopStashGui {
 
         ItemStack toggleSell = new ItemStack(shop.isSellEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
         var sm = toggleSell.getItemMeta();
-        sm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufsstatus ändern").decoration(TextDecoration.ITALIC,false));
+        sm.displayName(messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.sellStatus").decoration(TextDecoration.ITALIC,false));
         sm.lore(List.of(
-                MiniMessage.miniMessage().deserialize((shop.isSellEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert")).decoration(TextDecoration.ITALIC,false)
+                (shop.isSellEnabled() ? messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.enabled") : messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.disabled")).decoration(TextDecoration.ITALIC,false)
         ));
         toggleSell.setItemMeta(sm);
         inv.setItem(43, toggleSell);
 
         ItemStack toggleBuy = new ItemStack(shop.isBuyEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
         var bm = toggleBuy.getItemMeta();
-        bm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Kaufsstatus ändern").decoration(TextDecoration.ITALIC,false));
+        bm.displayName(messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.buyStatus").decoration(TextDecoration.ITALIC,false));
         bm.lore(List.of(
-                MiniMessage.miniMessage().deserialize(shop.isBuyEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert").decoration(TextDecoration.ITALIC,false))
-        );
+                (shop.isBuyEnabled() ? messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.enabled") : messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.disabled")).decoration(TextDecoration.ITALIC,false)
+        ));
         toggleBuy.setItemMeta(bm);
         inv.setItem(44, toggleBuy);
 
         ItemStack changeSellPrice = new ItemStack(Material.NAME_TAG);
         var spm = changeSellPrice.getItemMeta();
-        spm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufspreis ändern").decoration(TextDecoration.ITALIC,false));
+        spm.displayName(messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.changeSellPrice").decoration(TextDecoration.ITALIC,false));
         spm.lore(List.of(
-                MiniMessage.miniMessage().deserialize("<gray>Aktueller Verkaufspreis <dark_gray>→ <#a3ff2b>" + shop.getSellPrice() + "€").decoration(TextDecoration.ITALIC,false)
+                messageUtils.getLocalizedMessage(player, "shopStashGui.currentSellPrice", shop.getSellPrice()).decoration(TextDecoration.ITALIC,false)
         ));
         changeSellPrice.setItemMeta(spm);
         inv.setItem(36, changeSellPrice);
 
         ItemStack changeBuyPrice = new ItemStack(Material.NAME_TAG);
         var bpm = changeBuyPrice.getItemMeta();
-        bpm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Ankaufspreis ändern").decoration(TextDecoration.ITALIC,false));
+        bpm.displayName(messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.changeBuyPrice").decoration(TextDecoration.ITALIC,false));
         bpm.lore(List.of(
-                MiniMessage.miniMessage().deserialize("<gray>Aktueller Ankaufspreis <dark_gray>→ <#a3ff2b>" + shop.getBuyPrice() + "€").decoration(TextDecoration.ITALIC,false)
+                messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.currentBuyPrice", shop.getBuyPrice()).decoration(TextDecoration.ITALIC,false)
         ));
         changeBuyPrice.setItemMeta(bpm);
         inv.setItem(37, changeBuyPrice);
 
         ItemStack changeAmount = new ItemStack(Material.NAME_TAG);
         var am = changeAmount.getItemMeta();
-        am.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufsmenge ändern").decoration(TextDecoration.ITALIC,false));
+        am.displayName(messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.changeAmount").decoration(TextDecoration.ITALIC,false));
         am.lore(List.of(
-                MiniMessage.miniMessage().deserialize("<gray>Aktuelle Verkaufsmenge <dark_gray>→ <#a3ff2b>" + shop.getAmountPerTrade() + "x").decoration(TextDecoration.ITALIC,false)
+                messageUtils.getLocalizedMessagComponentNoPrefix(player, "shopStashGui.currentAmount", shop.getAmountPerTrade()).decoration(TextDecoration.ITALIC,false)
         ));
         changeAmount.setItemMeta(am);
         inv.setItem(38, changeAmount);
@@ -89,20 +91,21 @@ public class ShopStashGui {
 
     public void openFor(Player player) {
         OPEN.put(player.getUniqueId(), shop.key());
-        player.openInventory(build());
+        player.openInventory(build(player));
     }
 
-    public static boolean isStash(Component title) {
+    public static boolean isStash(Component title, Player player) {
         if (title == null) return false;
         String raw = GuiTitleUtil.getRawTitle(title); // entfernt Padding
-        return raw.contains(TITLE);
+        MessageUtils messageUtils = MessageUtilsSingleton.getInstance();
+        return raw.contains(messageUtils.getLocalizedMessageStringNoPrefix(player, "shopStashGui.title"));
     }
 
     private String fmt(double v) { return String.format("%.2f€", v); }
 
     public static void saveBack(PlayerShop shop, Inventory inv, Player player) {
         List<ItemStack> collected = new ArrayList<>();
-
+        MessageUtils messageUtils = MessageUtilsSingleton.getInstance();
         for (int i = 0; i <= 35; i++) {
             ItemStack is = inv.getItem(i);
             if (is == null || is.getType() == Material.AIR) continue;
@@ -112,7 +115,7 @@ public class ShopStashGui {
                 leftover.values().forEach(item ->
                         player.getWorld().dropItemNaturally(player.getLocation(), item)
                 );
-                player.sendMessage(MiniMessage.miniMessage().deserialize("<#ff1717>Dieses Item gehört nicht in dem Lager und wurde dir zurückgegeben!"));
+                messageUtils.sendLocalizedMessage(player, "shopStashGui.wrongItem");
                 continue;
             }
 

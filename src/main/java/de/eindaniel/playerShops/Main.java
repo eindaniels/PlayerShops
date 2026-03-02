@@ -11,6 +11,8 @@ import de.eindaniel.playerShops.notifications.NotificationManager;
 import de.eindaniel.playerShops.notifications.PlayerJoinListener;
 import de.eindaniel.playerShops.shop.ShopManager;
 import de.eindaniel.playerShops.shop.ShopStorage;
+import de.eindaniel.playerShops.util.MessageUtils;
+import de.eindaniel.playerShops.util.MessageUtilsSingleton;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -43,6 +45,7 @@ public class Main extends JavaPlugin {
         saveConfig();
         instance = this;
         notificationManager = new NotificationManager(this);
+        MessageUtilsSingleton.initialize(this);
 
         vault = new VaultHook(this);
         if (!vault.hook()) {

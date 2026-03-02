@@ -1,7 +1,10 @@
 package de.eindaniel.playerShops.commands;
 
+import com.mojang.brigadier.Message;
 import de.eindaniel.playerShops.Main;
 import de.eindaniel.playerShops.shop.PlayerShop;
+import de.eindaniel.playerShops.util.MessageUtils;
+import de.eindaniel.playerShops.util.MessageUtilsSingleton;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.block.Block;
@@ -23,25 +26,31 @@ public class RemoveShopCommand extends Command {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String @NotNull [] args) {
+        MessageUtils messageUtils = MessageUtilsSingleton.getInstance();
         if (!(sender instanceof Player p)) { sender.sendMessage("Nur Spieler."); return true; }
-        if (!p.hasPermission("playershop.remove")) { p.sendMessage("Keine Berechtigung."); return true; }
+        if (!p.hasPermission("playershop.remove")) { messageUtils.sendLocalizedMessage(p, "noperm"); return true; }
 
         Block look = p.getTargetBlockExact(6);
-        Component targetBlock = MiniMessage.miniMessage().deserialize("<#ff1717>Ziele auf den Block unter dem Shop.");
-        if (look == null) { p.sendMessage(Main.prefix().append(targetBlock)); return true; }
+        if (look == null) {
+            messageUtils.sendLocalizedMessage(p, "removeshop.targetBlock");
+            return true;
+        }
 
         String key = look.getWorld().getName() + ":" + (look.getX()+0) + ":" + (look.getY()+1) + ":" + (look.getZ()+0);
         Optional<PlayerShop> shopOpt = plugin.shops().getByKey(key);
-        Component noShop = MiniMessage.miniMessage().deserialize("<#ff1717>Hier ist kein Spielershop!");
-        if (shopOpt.isEmpty()) { p.sendMessage(Main.prefix().append(noShop)); return true; }
+        if (shopOpt.isEmpty()) {
+            messageUtils.sendLocalizedMessage(p, "removeshop.noShop");
+            return true;
+        }
         PlayerShop shop = shopOpt.get();
 
-        Component notOwner = MiniMessage.miniMessage().deserialize("<#ff1717>Du bist nicht der Besitzer!");
-        if (!shop.getOwner().equals(p.getUniqueId())) { p.sendMessage(Main.prefix().append(notOwner)); return true; }
+        if (!shop.getOwner().equals(p.getUniqueId())) {
+            messageUtils.sendLocalizedMessage(p, "removeshop.notOwner");
+            return true;
+        }
 
         if (shop.countStashMaterial() > 0) {
-            Component notEmptyStash = MiniMessage.miniMessage().deserialize("<#ff1717>Du hast noch Sachen in deinem Lager!");
-            p.sendMessage(Main.prefix().append(notEmptyStash));
+            messageUtils.sendLocalizedMessage(p, "removeshop.itemsInStash");
             return true;
         }
 
@@ -49,10 +58,8 @@ public class RemoveShopCommand extends Command {
 
         if (refundPrice != 0 || refundPrice != -1) {
             plugin.vault().deposit(p, refundPrice);
-            Component transaction = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich! (Shop-Refund)");
-            Component price = MiniMessage.miniMessage().deserialize("<#ff1717>+ " + String.format("%.2f€", refundPrice));
-            p.sendMessage(Main.prefix().append(transaction));
-            p.sendMessage(Main.prefix().append(price));
+            messageUtils.sendLocalizedMessage(p, "removeshop.price.transactionSuccess");
+            messageUtils.sendLocalizedMessage(p, "removeshop.price.amount", String.format("%.2f€", refundPrice));
         }
 
         plugin.entities().despawnAll(); // einfache Variante: alles weg
@@ -60,8 +67,7 @@ public class RemoveShopCommand extends Command {
         try { plugin.storage().saveAll(); } catch (Exception ignored) {}
         plugin.entities().spawnAll();
 
-        Component removedShop = MiniMessage.miniMessage().deserialize("<#1fff17>Dein Shop wurde erfolgreich entfernt.");
-        p.sendMessage(Main.prefix().append(removedShop));
+        messageUtils.sendLocalizedMessage(p, "removeshop.removed");
         return true;
     }
 }

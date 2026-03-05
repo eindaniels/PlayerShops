@@ -11,6 +11,7 @@ import de.eindaniel.playerShops.notifications.NotificationManager;
 import de.eindaniel.playerShops.notifications.PlayerJoinListener;
 import de.eindaniel.playerShops.shop.ShopManager;
 import de.eindaniel.playerShops.shop.ShopStorage;
+import de.eindaniel.playerShops.util.VersionChecker;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -51,6 +52,17 @@ public class Main extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        new VersionChecker(this, "eindaniels", "PlayerShops").check((result, latest) ->{
+            if (result == VersionChecker.Result.OUTDATED) {
+                getLogger().warning("Neue Version verfügbar: " + latest);
+                getLogger().warning("Download: https://github.com/eindaniels/PlayerShops/releases/latest");
+            } else if (result == VersionChecker.Result.UP_TO_DATE) {
+                getLogger().info("Plugin ist aktuell.");
+            } else if (result == VersionChecker.Result.UNKNOWN) {
+                getLogger().warning("Plugin Version konnte nicht erkannt werden.");
+            }
+        });
 
         storage = new ShopStorage(this);
         shopManager = new ShopManager(this, storage);

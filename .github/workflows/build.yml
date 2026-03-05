@@ -2,9 +2,9 @@ name: Build & Release Dev
 
 on:
   push:
-    branches: [ "master", "main" ]
+    branches: [ "master", "dev" ]
   pull_request:
-    branches: [ "master", "main" ]
+    branches: [ "master", "dev" ]
 
 jobs:
   build:

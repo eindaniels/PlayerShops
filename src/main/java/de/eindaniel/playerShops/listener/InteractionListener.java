@@ -1,15 +1,11 @@
 package de.eindaniel.playerShops.listener;
 
 import de.eindaniel.playerShops.Main;
-import de.eindaniel.playerShops.entity.ShopEntityManager;
 import de.eindaniel.playerShops.exceptions.StashFullException;
 import de.eindaniel.playerShops.gui.ShopGui;
 import de.eindaniel.playerShops.gui.ShopStashGui;
-import de.eindaniel.playerShops.notifications.NotificationManager;
 import de.eindaniel.playerShops.shop.PlayerShop;
 import de.eindaniel.playerShops.util.ChatInputHandler;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -23,16 +19,15 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class InteractionListener implements Listener {
 
     private final Main plugin;
+    private static final MiniMessage MM = MiniMessage.miniMessage();
 
     public InteractionListener(Main plugin) {
         this.plugin = plugin;
@@ -45,321 +40,246 @@ public class InteractionListener implements Listener {
         Optional<String> keyOpt = plugin.entities().readKey(it.getPersistentDataContainer());
         if (keyOpt.isEmpty()) return;
 
-        var shopOpt = plugin.shops().getByKey(keyOpt.get());
+        Optional<PlayerShop> shopOpt = plugin.shops().getByKey(keyOpt.get());
         if (shopOpt.isEmpty()) return;
-        PlayerShop shop = shopOpt.get();
 
         e.setCancelled(true);
-
+        PlayerShop shop = shopOpt.get();
         Player p = e.getPlayer();
+
         if (shop.getOwner().equals(p.getUniqueId())) {
-            ShopStashGui gui = new ShopStashGui(plugin, shop);
-            gui.openFor(p);
+            new ShopStashGui(plugin, shop).openFor(p);
         } else {
-            Inventory inv = new ShopGui(shop).build();
-            p.openInventory(inv);
+            p.openInventory(new ShopGui(shop).build());
         }
     }
 
     @EventHandler
     public void onClose(InventoryCloseEvent e) {
+        if (!(e.getPlayer() instanceof Player p)) return;
         if (!ShopStashGui.isStash(e.getView().title())) return;
 
-        Player p = (Player) e.getPlayer();
-
-        UUID pid = p.getUniqueId();
-        String key = ShopStashGui.OPEN.remove(pid);
+        String key = ShopStashGui.OPEN.remove(p.getUniqueId());
         if (key == null) return;
 
-        var shopOpt = plugin.shops().getByKey(key);
-        if (shopOpt.isEmpty()) return;
-        PlayerShop shop = shopOpt.get();
-
-        ShopStashGui.saveBack(shop, e.getInventory(), p);
-
-        plugin.entities().updateLabel(shop);
-        shop.updateDisplay();
-        try {
-            plugin.storage().saveAll();
-        } catch (Exception ignored) {}
+        plugin.shops().getByKey(key).ifPresent(shop -> {
+            ShopStashGui.saveBack(shop, e.getInventory(), p);
+            plugin.entities().updateLabel(shop);
+            shop.updateDisplay();
+            try { plugin.storage().saveAll(); } catch (Exception ignored) {}
+        });
     }
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
 
-        // --- Shop-GUI (Kauf/Verkauf) ---
+        // ---- Shop-GUI (Kauf / Verkauf für andere Spieler) ----
         if (ShopGui.isShop(e.getView().title())) {
             e.setCancelled(true);
 
-            PlayerShop shop = nearestShopToViewer(p);
-            if (shop == null) {
-                p.closeInventory();
-                return;
-            }
+            PlayerShop shop = nearestShop(p);
+            if (shop == null) { p.closeInventory(); return; }
 
             if (shop.getOwner().equals(p.getUniqueId())) {
-                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Du kannst deinen eigenen Shop nicht benutzen.")));
+                p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.ownShop"))));
                 return;
             }
 
             int slot = e.getRawSlot();
-            if (slot == 11 && shop.isBuyEnabled()) {
-                int need = shop.getAmountPerTrade();
-                if (shop.countStashMaterial() < need) {
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Das Lager von diesem Shop ist leer!")));
-                    return;
-                }
-                double price = shop.getBuyPrice();
-                if (!plugin.vault().has(p, price)) {
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Du hast nicht genug Geld!")));
-                    return;
-                }
-                if (!plugin.vault().withdraw(p, price)) {
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Die Zahlung ist fehlgeschlagen, bitte melde das einem Entwickler.")));
-                    return;
-                }
-
-                OfflinePlayer owner = plugin.getServer().getOfflinePlayer(shop.getOwner());
-                plugin.vault().deposit(owner, price);
-
-                int taken = shop.takeFromStash(need);
-
-                ItemStack give = shop.getDisplayItem();
-                give.setAmount(taken);
-                var leftover = p.getInventory().addItem(give);
-                if (!leftover.isEmpty()) {
-                    leftover.values().forEach(item -> p.getWorld().dropItemNaturally(p.getLocation(), item));
-                }
-
-                Component bought1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
-                Component bought2 = MiniMessage.miniMessage().deserialize("<#1fff17>+ <gray>" + taken + "x <white><lang:" + shop.getDisplayItem().translationKey() + ">");
-                Component bought3 = MiniMessage.miniMessage().deserialize("<#ff1717>- <#a3ff2b>" + String.format("%.2f€", price));
-                p.sendMessage(Main.prefix().append(bought1));
-                p.sendMessage(Main.prefix().append(bought2));
-                p.sendMessage(Main.prefix().append(bought3));
-                Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat für " + String.format("%.2f", price) + "€ in einer deiner Shops eingekauft. (Kauf)");
-                plugin.notifications().notifyShopOwner(shop.getOwner(), msg);
-                plugin.entities().updateLabel(shop);
-                shop.updateDisplay();
-                try {
-                    plugin.storage().saveAll();
-                } catch (Exception ignored) {
-                }
-            } else if (slot == 15 && shop.isSellEnabled()) {
-                int need = shop.getAmountPerTrade();
-                if (!hasItems(p, shop.getDisplayItem(), need)) {
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Du hast nicht genug <lang:" + shop.getDisplayItem().translationKey() + ">.")));
-                    return;
-                }
-                double price = shop.getSellPrice();
-                OfflinePlayer owner = plugin.getServer().getOfflinePlayer(shop.getOwner());
-                if (!plugin.vault().has(owner, price)) {
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Der Shop-Besitzer hat nicht genug Geld!")));
-                    return;
-                }
-                try {
-                    shop.addToStash(need);
-                } catch (IllegalStateException | StashFullException ex) {
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Zu viele Items im Shop-Lager!")));
-                    return;
-                }
-                if (!plugin.vault().withdraw(owner, price)) {
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Die Auszahlung ist fehlgeschlagen, bitte melde dies einem Entwickler.")));
-                    return;
-                }
-                if (!plugin.vault().deposit(p, price)) {
-                    plugin.vault().deposit(owner, price);
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Die Auszahlung ist fehlgeschlagen, bitte melde dies einem Entwickler.")));
-                    return;
-                }
-                Component msg = MiniMessage.miniMessage().deserialize("<#1fff17>" + p.getName() + " hat in einer deiner Shops " + String.format("%.2f", price) + "€ erhalten. (Verkauf)");
-                plugin.notifications().notifyShopOwner(shop.getOwner(), msg);
-                takeItems(p, shop.getDisplayItem(), need);
-
-                Component selled1 = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
-                Component selled2 = MiniMessage.miniMessage().deserialize("<#ff1717>- <gray>" + need + "x <white><lang:" + shop.getDisplayItem().translationKey() + ">");
-                Component selled3 = MiniMessage.miniMessage().deserialize("<#a3ff2b>+ " + String.format("%.2f€", price));
-                p.sendMessage(Main.prefix().append(selled1));
-                p.sendMessage(Main.prefix().append(selled2));
-                p.sendMessage(Main.prefix().append(selled3));
-                plugin.entities().updateLabel(shop);
-                shop.updateDisplay();
-                try {
-                    plugin.storage().saveAll();
-                } catch (Exception ignored) {
-                }
-            }
+            if (slot == 11 && shop.isBuyEnabled()) handleBuy(p, shop);
+            else if (slot == 15 && shop.isSellEnabled()) handleSell(p, shop);
             return;
         }
 
-        // --- Stash-GUI (Owner) ---
+        // ---- Stash-GUI (Owner) ----
         if (ShopStashGui.isStash(e.getView().title())) {
             int slot = e.getRawSlot();
 
-            // --- Toggle verkaufen/kaufen ---
-            if (slot == 43 || slot == 44 || slot == 40 || slot == 39 || slot == 41 || slot == 42) {
+            if (slot >= 36 && slot <= 44) {
                 e.setCancelled(true);
-
-                String key = ShopStashGui.OPEN.get(p.getUniqueId());
-                Optional<PlayerShop> shopOpt = Optional.empty();
-                if (key != null) shopOpt = plugin.shops().getByKey(key);
-                if (shopOpt.isEmpty()) {
-                    PlayerShop fallback = nearestShopToViewer(p);
-                    if (fallback == null) return;
-                    shopOpt = Optional.of(fallback);
-                }
-                PlayerShop shop = shopOpt.get();
-
-                if (slot == 43) {
-                    shop.setSellEnabled(!shop.isSellEnabled());
-
-                    ItemStack toggleSell = new ItemStack(shop.isSellEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
-                    ItemMeta sm = toggleSell.getItemMeta();
-                    if (sm != null) {
-                        sm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufsstatus ändern").decoration(TextDecoration.ITALIC,false));
-                        sm.lore(List.of(
-                                MiniMessage.miniMessage().deserialize((shop.isSellEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert")).decoration(TextDecoration.ITALIC,false)
-                        ));
-                    }
-                    toggleSell.setItemMeta(sm);
-                    e.getInventory().setItem(43, toggleSell);
-
-                    plugin.entities().updateLabel(shop);
-                    shop.updateDisplay();
-                    try {
-                        plugin.storage().saveAll();
-                    } catch (Exception ignored) {
-                    }
-                } else if (slot == 44) {
-                    shop.setBuyEnabled(!shop.isBuyEnabled());
-
-                    ItemStack toggleBuy = new ItemStack(shop.isBuyEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
-                    ItemMeta bm = toggleBuy.getItemMeta();
-                    if (bm != null) {
-                        bm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Kaufsstatus ändern").decoration(TextDecoration.ITALIC,false));
-                        bm.lore(List.of(
-                                MiniMessage.miniMessage().deserialize(shop.isBuyEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert").decoration(TextDecoration.ITALIC,false))
-                        );
-                    }
-                    toggleBuy.setItemMeta(bm);
-                    e.getInventory().setItem(44, toggleBuy);
-
-                    plugin.entities().updateLabel(shop);
-                    shop.updateDisplay();
-                    try {
-                        plugin.storage().saveAll();
-                    } catch (Exception ignored) {
-                    }
-                }
-                return;
-            }
-
-            if (slot == 36 || slot == 37 || slot == 38) {
-                e.setCancelled(true);
-
                 String key = ShopStashGui.OPEN.get(p.getUniqueId());
                 if (key == null) return;
-                var shopOpt = plugin.shops().getByKey(key);
-                if (shopOpt.isEmpty()) return;
-                PlayerShop shop = shopOpt.get();
-
-                if (slot == 36) {
-                    p.closeInventory();
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<gray>Bitte gib einen neuen <#a3ff2b>Verkaufspreis<gray> im Chat ein.")));
-                    new ChatInputHandler(p, input -> {
-                        try {
-                            double price = Double.parseDouble(input);
-                            shop.setSellPrice(price);
-                            p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#a3ff2b>Verkaufspreis geändert zu <dark_gray>→ <#a3ff2b>" + price)));
-                            plugin.entities().updateLabel(shop);
-                            shop.updateDisplay();
-                            try {
-                                plugin.storage().saveAll();
-                            } catch (Exception ignored) {
-                            }
-                        } catch (NumberFormatException ex) {
-                            p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Ungültige Zahl!")));
-                        }
-                        Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
-                    });
-                }
-
-                if (slot == 37) {
-                    p.closeInventory();
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
-                            "<gray>Bitte gib einen neuen <#a3ff2b>Ankaufspreis<gray> im Chat ein.")));
-
-                    new ChatInputHandler(p, input -> {
-                        Bukkit.getScheduler().runTask(plugin, () -> {
-                            if (input.equalsIgnoreCase("abbrechen")) {
-                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Eingabe abgebrochen.")));
-                                new ShopStashGui(plugin, shop).openFor(p);
-                                return;
-                            }
-
-                            try {
-                                double price = Double.parseDouble(input);
-                                shop.setBuyPrice(price);
-                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
-                                        "<#a3ff2b>Ankaufspreis geändert zu <dark_gray>→ <#a3ff2b>" + price)));
-
-                                plugin.entities().updateLabel(shop);
-                                shop.updateDisplay();
-                                try {
-                                    plugin.storage().saveAll();
-                                } catch (Exception ignored) {}
-
-                            } catch (NumberFormatException ex) {
-                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Ungültige Zahl!")));
-                            }
-                            new ShopStashGui(plugin, shop).openFor(p);
-                        });
-                    });
-                }
-                if (slot == 38) {
-                    p.closeInventory();
-                    p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
-                            "<gray>Bitte gib eine neue <#a3ff2b>Verkaufsmenge<gray> im Chat ein.")));
-
-                    new ChatInputHandler(p, input -> {
-                        Bukkit.getScheduler().runTask(plugin, () -> {
-                            if (input.equalsIgnoreCase("abbrechen")) {
-                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Eingabe abgebrochen.")));
-                                new ShopStashGui(plugin, shop).openFor(p);
-                                return;
-                            }
-
-                            try {
-                                int amount = Integer.parseInt(input);
-                                shop.setAmountPerTrade(amount);
-                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
-                                        "<#a3ff2b>Verkaufsmenge geändert zu <dark_gray>→ <#fbecab>" + amount + "x")));
-
-                                plugin.entities().updateLabel(shop);
-                                shop.updateDisplay();
-                                try {
-                                    plugin.storage().saveAll();
-                                } catch (Exception ignored) {}
-
-                            } catch (NumberFormatException ex) {
-                                p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Ungültige Zahl!")));
-                            }
-                            new ShopStashGui(plugin, shop).openFor(p);
-                        });
-                    });
-                }
+                plugin.shops().getByKey(key).ifPresent(shop -> handleStashControl(p, shop, slot));
                 return;
             }
 
             ItemStack clicked = e.getCurrentItem();
-            if (clicked != null && (clicked.getType() == Material.EMERALD_BLOCK || clicked.getType() == Material.REDSTONE_BLOCK)) {
+            if (clicked != null && (clicked.getType() == Material.EMERALD_BLOCK
+                    || clicked.getType() == Material.REDSTONE_BLOCK
+                    || clicked.getType() == Material.NAME_TAG)) {
                 e.setCancelled(true);
             }
         }
     }
 
-    private PlayerShop nearestShopToViewer(Player p) {
+
+    private void handleBuy(Player p, PlayerShop shop) {
+        int need = shop.getAmountPerTrade();
+        if (shop.countStashMaterial() < need) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.emptyStash"))));
+            return;
+        }
+        double price = shop.getBuyPrice();
+        if (!plugin.vault().has(p, price)) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.notEnoughMoney"))));
+            return;
+        }
+        if (!plugin.vault().withdraw(p, price)) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.ecoError"))));
+            return;
+        }
+
+        OfflinePlayer owner = plugin.getServer().getOfflinePlayer(shop.getOwner());
+        plugin.vault().deposit(owner, price);
+
+        int taken = shop.takeFromStash(need);
+        ItemStack give = shop.getDisplayItem().clone();
+        give.setAmount(taken);
+        var leftover = p.getInventory().addItem(give);
+        leftover.values().forEach(item -> p.getWorld().dropItemNaturally(p.getLocation(), item));
+
+        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.transactionSuccess"))));
+        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.gotBlocks", taken, shop.getDisplayItem().translationKey()))));
+        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.tookMoney", String.format("%.2f€", price)))));
+
+        plugin.notifications().notifyShopOwner(shop.getOwner(),
+                MM.deserialize(plugin.i18n().get("interaction.notificationBuy", p.getName(), String.format("%.2f", price))));
+
+        updateAndSave(shop);
+    }
+
+    private void handleSell(Player p, PlayerShop shop) {
+        int need = shop.getAmountPerTrade();
+        if (!hasItems(p, shop.getDisplayItem(), need)) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(
+                    plugin.i18n().get("interaction.notEnoughBlocks", shop.getDisplayItem().translationKey()))));
+            return;
+        }
+
+        double price = shop.getSellPrice();
+        OfflinePlayer owner = plugin.getServer().getOfflinePlayer(shop.getOwner());
+
+        if (!plugin.vault().has(owner, price)) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.noMoneyOwner"))));
+            return;
+        }
+
+        try {
+            shop.addToStash(need);
+        } catch (IllegalStateException | StashFullException ex) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.stashFull"))));
+            return;
+        }
+
+        if (!plugin.vault().withdraw(owner, price)) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.ecoError2"))));
+            return;
+        }
+        if (!plugin.vault().deposit(p, price)) {
+            plugin.vault().deposit(owner, price); // Rollback
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.ecoError2"))));
+            return;
+        }
+
+        takeItems(p, shop.getDisplayItem(), need);
+
+        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.transactionSuccess"))));
+        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.tookBlocks", need, shop.getDisplayItem().translationKey()))));
+        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.gotMoney", String.format("%.2f€", price)))));
+
+        plugin.notifications().notifyShopOwner(shop.getOwner(),
+                MM.deserialize(plugin.i18n().get("interaction.notificationSell", p.getName(), String.format("%.2f", price))));
+
+        updateAndSave(shop);
+    }
+
+    private void handleStashControl(Player p, PlayerShop shop, int slot) {
+        switch (slot) {
+            case 43 -> { // Toggle Sell
+                shop.setSellEnabled(!shop.isSellEnabled());
+                refreshStashSlot(p, shop, 43);
+                updateAndSave(shop);
+            }
+            case 44 -> { // Toggle Buy
+                shop.setBuyEnabled(!shop.isBuyEnabled());
+                refreshStashSlot(p, shop, 44);
+                updateAndSave(shop);
+            }
+            case 36 -> promptChatInput(p, shop,
+                    plugin.i18n().get("interaction.chatInput.newBuyPrice"),
+                    input -> {
+                        try {
+                            double price = Double.parseDouble(input);
+                            if (price < 0) throw new NumberFormatException();
+                            shop.setSellPrice(price);
+                            p.sendMessage(Main.prefix().append(MM.deserialize(
+                                    plugin.i18n().get("interaction.chatInput.changedBuyPrice", price))));
+                            updateAndSave(shop);
+                        } catch (NumberFormatException ex) {
+                            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.chatInput.wrongInt"))));
+                        }
+                        Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
+                    })
+            ;
+            case 37 -> promptChatInput(p, shop,
+                    plugin.i18n().get("interaction.chatInput.newSellPrice"),
+                    input -> {
+                        try {
+                            double price = Double.parseDouble(input);
+                            if (price < 0) throw new NumberFormatException();
+                            shop.setBuyPrice(price);
+                            p.sendMessage(Main.prefix().append(MM.deserialize(
+                                    plugin.i18n().get("interaction.chatInput.changedSellPrice", price))));
+                            updateAndSave(shop);
+                        } catch (NumberFormatException ex) {
+                            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.chatInput.wrongInt"))));
+                        }
+                        Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
+                    })
+            ;
+            case 38 -> promptChatInput(p, shop,
+                    plugin.i18n().get("interaction.chatInput.newAmount"),
+                    input -> {
+                        try {
+                            int amount = Integer.parseInt(input);
+                            if (amount <= 0) throw new NumberFormatException();
+                            shop.setAmountPerTrade(amount);
+                            p.sendMessage(Main.prefix().append(MM.deserialize(
+                                    plugin.i18n().get("interaction.chatInput.changedAmount", amount))));
+                            updateAndSave(shop);
+                        } catch (NumberFormatException ex) {
+                            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.chatInput.wrongInt"))));
+                        }
+                        Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
+                    })
+            ;
+        }
+    }
+
+    private void promptChatInput(Player p, PlayerShop shop, String prompt, java.util.function.Consumer<String> callback) {
+        p.closeInventory();
+        p.sendMessage(Main.prefix().append(MM.deserialize(prompt)));
+        new ChatInputHandler(p, callback);
+    }
+
+    private void refreshStashSlot(Player p, PlayerShop shop, int slot) {
+        Inventory openInv = p.getOpenInventory().getTopInventory();
+        if (slot == 43) {
+            openInv.setItem(43, new ShopStashGui(plugin, shop).build().getItem(43));
+        } else if (slot == 44) {
+            openInv.setItem(44, new ShopStashGui(plugin, shop).build().getItem(44));
+        }
+    }
+
+
+    private void updateAndSave(PlayerShop shop) {
+        plugin.entities().updateLabel(shop);
+        shop.updateDisplay();
+        try { plugin.storage().saveAll(); } catch (Exception ignored) {}
+    }
+
+    private PlayerShop nearestShop(Player p) {
         return plugin.shops().all().stream()
                 .filter(s -> s.getBaseLocation().getWorld().equals(p.getWorld()))
                 .filter(s -> s.getBaseLocation().distance(p.getLocation()) <= 6.0)
@@ -367,21 +287,21 @@ public class InteractionListener implements Listener {
                 .orElse(null);
     }
 
-    private boolean hasItems(Player p, ItemStack itemStack, int amount) {
+    private boolean hasItems(Player p, ItemStack template, int amount) {
         int count = 0;
         for (ItemStack is : p.getInventory().getStorageContents()) {
-            if (is != null && is.isSimilar(itemStack)) count += is.getAmount();
+            if (is != null && is.isSimilar(template)) count += is.getAmount();
             if (count >= amount) return true;
         }
         return false;
     }
 
-    private void takeItems(Player p, ItemStack itemStack, int amount) {
+    private void takeItems(Player p, ItemStack template, int amount) {
         int left = amount;
         var inv = p.getInventory();
         for (int i = 0; i < inv.getSize() && left > 0; i++) {
             ItemStack is = inv.getItem(i);
-            if (is == null || !is.isSimilar(itemStack)) continue;
+            if (is == null || !is.isSimilar(template)) continue;
             int take = Math.min(is.getAmount(), left);
             is.setAmount(is.getAmount() - take);
             if (is.getAmount() <= 0) inv.setItem(i, null);

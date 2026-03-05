@@ -3,26 +3,25 @@ package de.eindaniel.playerShops.gui;
 import de.eindaniel.playerShops.Main;
 import de.eindaniel.playerShops.shop.PlayerShop;
 import de.eindaniel.playerShops.util.GuiTitleUtil;
-import de.eindaniel.playerShops.util.ItemSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ShopStashGui {
 
-    public static final String TITLE = "Shop Lager";
+    private static final MiniMessage MM = MiniMessage.miniMessage();
+
+    public static final Map<UUID, String> OPEN = new ConcurrentHashMap<>();
 
     private final Main plugin;
     private final PlayerShop shop;
-
-    public static final Map<UUID, String> OPEN = new ConcurrentHashMap<>();
 
     public ShopStashGui(Main plugin, PlayerShop shop) {
         this.plugin = plugin;
@@ -30,59 +29,47 @@ public class ShopStashGui {
     }
 
     public Inventory build() {
-        Inventory inv = GuiTitleUtil.createCenteredInventory(45, TITLE);
+        String title = plugin.i18n().get("shopStashGui.title");
+        Inventory inv = GuiTitleUtil.createCenteredInventory(45, title);
 
+        // Stash-Items (Slots 0–35)
         int idx = 0;
         for (ItemStack is : shop.getStashItems()) {
-            if (is == null) continue;
-            if (idx > 35) break;
+            if (is == null || idx > 35) continue;
             inv.setItem(idx++, is.clone());
         }
 
-        ItemStack toggleSell = new ItemStack(shop.isSellEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
-        var sm = toggleSell.getItemMeta();
-        sm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufsstatus ändern").decoration(TextDecoration.ITALIC,false));
-        sm.lore(List.of(
-                MiniMessage.miniMessage().deserialize((shop.isSellEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert")).decoration(TextDecoration.ITALIC,false)
+        // Toggle Sell (Slot 43)
+        inv.setItem(43, buildToggle(
+                shop.isSellEnabled(),
+                plugin.i18n().get("shopStashGui.sellStatus"),
+                plugin.i18n().get(shop.isSellEnabled() ? "shopStashGui.enabled" : "shopStashGui.disabled")
         ));
-        toggleSell.setItemMeta(sm);
-        inv.setItem(43, toggleSell);
 
-        ItemStack toggleBuy = new ItemStack(shop.isBuyEnabled() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
-        var bm = toggleBuy.getItemMeta();
-        bm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Kaufsstatus ändern").decoration(TextDecoration.ITALIC,false));
-        bm.lore(List.of(
-                MiniMessage.miniMessage().deserialize(shop.isBuyEnabled() ? "<#1fff17>Aktiviert" : "<#ff1717>Deaktiviert").decoration(TextDecoration.ITALIC,false))
-        );
-        toggleBuy.setItemMeta(bm);
-        inv.setItem(44, toggleBuy);
-
-        ItemStack changeSellPrice = new ItemStack(Material.NAME_TAG);
-        var spm = changeSellPrice.getItemMeta();
-        spm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufspreis ändern").decoration(TextDecoration.ITALIC,false));
-        spm.lore(List.of(
-                MiniMessage.miniMessage().deserialize("<gray>Aktueller Verkaufspreis <dark_gray>→ <#a3ff2b>" + shop.getSellPrice() + "€").decoration(TextDecoration.ITALIC,false)
+        // Toggle Buy (Slot 44)
+        inv.setItem(44, buildToggle(
+                shop.isBuyEnabled(),
+                plugin.i18n().get("shopStashGui.buyStatus"),
+                plugin.i18n().get(shop.isBuyEnabled() ? "shopStashGui.enabled" : "shopStashGui.disabled")
         ));
-        changeSellPrice.setItemMeta(spm);
-        inv.setItem(36, changeSellPrice);
 
-        ItemStack changeBuyPrice = new ItemStack(Material.NAME_TAG);
-        var bpm = changeBuyPrice.getItemMeta();
-        bpm.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Ankaufspreis ändern").decoration(TextDecoration.ITALIC,false));
-        bpm.lore(List.of(
-                MiniMessage.miniMessage().deserialize("<gray>Aktueller Ankaufspreis <dark_gray>→ <#a3ff2b>" + shop.getBuyPrice() + "€").decoration(TextDecoration.ITALIC,false)
+        // Change Sell Price (Slot 36)
+        inv.setItem(36, buildNameTag(
+                plugin.i18n().get("shopStashGui.changeSellPrice"),
+                plugin.i18n().get("shopStashGui.currentSellPrice", String.format("%.2f", shop.getSellPrice()))
         ));
-        changeBuyPrice.setItemMeta(bpm);
-        inv.setItem(37, changeBuyPrice);
 
-        ItemStack changeAmount = new ItemStack(Material.NAME_TAG);
-        var am = changeAmount.getItemMeta();
-        am.displayName(MiniMessage.miniMessage().deserialize("<#ffc900>Verkaufsmenge ändern").decoration(TextDecoration.ITALIC,false));
-        am.lore(List.of(
-                MiniMessage.miniMessage().deserialize("<gray>Aktuelle Verkaufsmenge <dark_gray>→ <#a3ff2b>" + shop.getAmountPerTrade() + "x").decoration(TextDecoration.ITALIC,false)
+        // Change Buy Price (Slot 37)
+        inv.setItem(37, buildNameTag(
+                plugin.i18n().get("shopStashGui.changeBuyPrice"),
+                plugin.i18n().get("shopStashGui.currentBuyPrice", String.format("%.2f", shop.getBuyPrice()))
         ));
-        changeAmount.setItemMeta(am);
-        inv.setItem(38, changeAmount);
+
+        // Change Amount (Slot 38)
+        inv.setItem(38, buildNameTag(
+                plugin.i18n().get("shopStashGui.changeAmount"),
+                plugin.i18n().get("shopStashGui.currentAmount", shop.getAmountPerTrade())
+        ));
 
         return inv;
     }
@@ -94,11 +81,9 @@ public class ShopStashGui {
 
     public static boolean isStash(Component title) {
         if (title == null) return false;
-        String raw = GuiTitleUtil.getRawTitle(title); // entfernt Padding
-        return raw.contains(TITLE);
+        return GuiTitleUtil.getRawTitle(title).contains(
+                Main.get().i18n().get("shopStashGui.title"));
     }
-
-    private String fmt(double v) { return String.format("%.2f€", v); }
 
     public static void saveBack(PlayerShop shop, Inventory inv, Player player) {
         List<ItemStack> collected = new ArrayList<>();
@@ -110,12 +95,12 @@ public class ShopStashGui {
             if (!is.isSimilar(shop.getDisplayItem())) {
                 var leftover = player.getInventory().addItem(is.clone());
                 leftover.values().forEach(item ->
-                        player.getWorld().dropItemNaturally(player.getLocation(), item)
-                );
-                player.sendMessage(MiniMessage.miniMessage().deserialize("<#ff1717>Dieses Item gehört nicht in dem Lager und wurde dir zurückgegeben!"));
+                        player.getWorld().dropItemNaturally(player.getLocation(), item));
+                player.sendMessage(Main.prefix().append(
+                        MiniMessage.miniMessage().deserialize(
+                                Main.get().i18n().get("shopStashGui.wrongItem"))));
                 continue;
             }
-
             collected.add(is.clone());
         }
 
@@ -123,21 +108,21 @@ public class ShopStashGui {
         shop.getStashItems().addAll(collected);
     }
 
-    public static List<String> serializeStash(PlayerShop shop) {
-        List<String> out = new ArrayList<>();
-        for (ItemStack is : shop.getStashItems()) {
-            try {
-                out.add(ItemSerializer.itemToBase64(is));
-            } catch (Exception ex) {
-                pluginLogWarn("Failed serializing item in stash: " + ex.getMessage());
-            }
-        }
-        return out;
+    private ItemStack buildToggle(boolean enabled, String displayName, String statusLore) {
+        ItemStack item = new ItemStack(enabled ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK);
+        var meta = item.getItemMeta();
+        meta.displayName(MM.deserialize(displayName).decoration(TextDecoration.ITALIC, false));
+        meta.lore(List.of(MM.deserialize(statusLore).decoration(TextDecoration.ITALIC, false)));
+        item.setItemMeta(meta);
+        return item;
     }
 
-    private static void pluginLogWarn(String s) {
-        try {
-            Main.get().getLogger().warning(s);
-        } catch (Throwable ignored) {}
+    private ItemStack buildNameTag(String displayName, String loreLine) {
+        ItemStack item = new ItemStack(Material.NAME_TAG);
+        var meta = item.getItemMeta();
+        meta.displayName(MM.deserialize(displayName).decoration(TextDecoration.ITALIC, false));
+        meta.lore(List.of(MM.deserialize(loreLine).decoration(TextDecoration.ITALIC, false)));
+        item.setItemMeta(meta);
+        return item;
     }
 }

@@ -1,0 +1,90 @@
+name: Build & Release Dev
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  build:
+    name: Build PlayerShops
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Checkout ───────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Java 21 ────────────────────────────────────────────────────────────
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      # ── Gradle wrapper permissions ──────────────────────────────────────────
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # ── Short commit hash ───────────────────────────────────────────────────
+      - name: Get short commit hash
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      # ── Build ───────────────────────────────────────────────────────────────
+      - name: Build with Gradle
+        run: ./gradlew shadowJar -Pplugin_version="1.0-${{ steps.vars.outputs.sha_short }}"
+
+      # ── Collect JARs ────────────────────────────────────────────────────────
+      # Falls mehrere JARs entstehen (z.B. für verschiedene MC-Versionen),
+      # werden sie zu einer ZIP gebündelt. Ansonsten nur das einzelne JAR.
+      - name: Collect & bundle JARs
+        id: bundle
+        run: |
+          mkdir -p artifacts
+          find build/libs -name "*.jar" -not -name "*-all.jar" | head -20 | xargs -I{} cp {} artifacts/ || true
+          JAR_COUNT=$(find artifacts -name "*.jar" | wc -l)
+          echo "jar_count=$JAR_COUNT" >> $GITHUB_OUTPUT
+
+          if [ "$JAR_COUNT" -gt 1 ]; then
+            cd artifacts
+            zip "../PlayerShops-dev-${{ steps.vars.outputs.sha_short }}.zip" *.jar
+            cd ..
+            echo "artifact_path=PlayerShops-dev-${{ steps.vars.outputs.sha_short }}.zip" >> $GITHUB_OUTPUT
+            echo "artifact_name=PlayerShops-dev-${{ steps.vars.outputs.sha_short }}.zip" >> $GITHUB_OUTPUT
+          else
+            SINGLE_JAR=$(find artifacts -name "*.jar" | head -1)
+            cp "$SINGLE_JAR" "PlayerShops-dev-${{ steps.vars.outputs.sha_short }}.jar"
+            echo "artifact_path=PlayerShops-dev-${{ steps.vars.outputs.sha_short }}.jar" >> $GITHUB_OUTPUT
+            echo "artifact_name=PlayerShops-dev-${{ steps.vars.outputs.sha_short }}.jar" >> $GITHUB_OUTPUT
+          fi
+
+      # ── Upload artifact ──────────────────────────────────────────────────────
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PlayerShops-dev-${{ steps.vars.outputs.sha_short }}
+          path: ${{ steps.bundle.outputs.artifact_path }}
+          retention-days: 30
+
+      # ── Dev Release (nur auf master/main, kein PR) ────────────────────────
+      - name: Create / update dev release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dev-latest
+          name: "Dev Build – ${{ steps.vars.outputs.sha_short }}"
+          prerelease: true
+          draft: false
+          body: |
+            🛠️ **Dev Build** – automatisch generiert beim Push auf `${{ github.ref_name }}`
+
+            **Commit:** `${{ github.sha }}`
+            **Version:** `1.0-${{ steps.vars.outputs.sha_short }}`
+
+            > ⚠️ Dies ist kein stabiles Release. Nutze es nur zum Testen!
+          files: ${{ steps.bundle.outputs.artifact_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

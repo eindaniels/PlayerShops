@@ -2,7 +2,6 @@ package de.eindaniel.playerShops.commands;
 
 import de.eindaniel.playerShops.Main;
 import de.eindaniel.playerShops.shop.PlayerShop;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,68 +14,79 @@ import org.jetbrains.annotations.NotNull;
 public class CreateShopCommand extends Command {
 
     private final Main plugin;
+    private static final MiniMessage MM = MiniMessage.miniMessage();
 
     public CreateShopCommand(Main plugin) {
         super("createshop");
         this.plugin = plugin;
+        setDescription("Erstellt einen neuen Spielershop.");
+        setPermission("playershop.create");
     }
 
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String @NotNull [] args) {
-        if (!(sender instanceof Player p)) { sender.sendMessage("Nur Spieler."); return true; }
-        if (!p.hasPermission("playershop.create")) { p.sendMessage("Keine Berechtigung."); return true; }
-        if (args.length < 3) {
-            Component usage = MiniMessage.miniMessage().deserialize("<gray>Richtige Verwendung <dark_gray>→ <#fbecab>/createshop <Verkaufspreis> <Ankaufspreis> <Menge>");
-            p.sendMessage(Main.prefix().append(usage));
+    public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        if (!(sender instanceof Player p)) {
+            sender.sendMessage("Nur Spieler können diesen Befehl nutzen.");
             return true;
         }
 
-        double buy, sell; int amount;
+        if (!p.hasPermission("playershop.create")) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("noperm"))));
+            return true;
+        }
+
+        if (args.length < 3) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("createshop.usage"))));
+            return true;
+        }
+
+        double buy, sell;
+        int amount;
         try {
             buy = Double.parseDouble(args[0]);
             sell = Double.parseDouble(args[1]);
             amount = Integer.parseInt(args[2]);
-            if (amount <= 0) throw new IllegalArgumentException();
+            if (buy < 0 || sell < 0 || amount <= 0) throw new IllegalArgumentException();
         } catch (Exception ex) {
-            Component invalidInt = MiniMessage.miniMessage().deserialize("<#ff1717>Ungültige Zahlen!");
-            p.sendMessage(Main.prefix().append(invalidInt)); return true;
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("createshop.invalidInt"))));
+            return true;
         }
 
         ItemStack hand = p.getInventory().getItemInMainHand();
-        
-//        if (hand.getType().equals(Material.ENCHANTED_BOOK) || hand.getType().equals(Material.POTION) || hand.getType().equals(Material.SPLASH_POTION) || hand.getType().equals(Material.LINGERING_POTION)) {
-//            p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Diese Items sind aktuell nicht verfügbar. Wir arbeiten an einem Fix.")));
-//            return true;
-//        }
-        
-        if (hand == null || hand.getType() == Material.AIR) {
-            Component holdItem = MiniMessage.miniMessage().deserialize("<gray>Halte das Item, was du verkaufen möchtest, in deiner Hand.");
-            p.sendMessage(Main.prefix().append(holdItem)); return true;
+        if (hand.getType() == Material.AIR) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("createshop.handNull"))));
+            return true;
         }
 
         Block look = p.getTargetBlockExact(6);
-        Component targetBlock = MiniMessage.miniMessage().deserialize("<#ff1717>Ziele auf einen Block im Umkreis von 6 Blöcken!");
-        if (look == null) { p.sendMessage(Main.prefix().append(targetBlock)); return true; }
+        if (look == null) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("createshop.targetBlock"))));
+            return true;
+        }
 
-        double pricePlayerShop = plugin.getConfig().getDouble("price-playershops");
-        if (pricePlayerShop != -1 ||  pricePlayerShop != 0) {
-            if (!plugin.vault().has(p, plugin.getConfig().getDouble("price-playershops"))) { p.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#ff1717>Du hast nicht genug Geld für einen SpielerShop! (" + pricePlayerShop + ")"))); return false; }
-            plugin.vault().withdraw(p, pricePlayerShop);
-            Component transaction = MiniMessage.miniMessage().deserialize("<#1fff17>Transaktion erfolgreich!");
-            Component price = MiniMessage.miniMessage().deserialize("<#ff1717>- " + String.format("%.2f€", pricePlayerShop));
-            p.sendMessage(Main.prefix().append(transaction));
-            p.sendMessage(Main.prefix().append(price));
-
+        double pricePlayerShop = plugin.config().getDouble("price-playershops", 0);
+        if (pricePlayerShop > 0) {
+            if (!plugin.vault().has(p, pricePlayerShop)) {
+                p.sendMessage(Main.prefix().append(MM.deserialize(
+                        plugin.i18n().get("createshop.price.noMoney", String.format("%.2f€", pricePlayerShop)))));
+                return true;
+            }
+            if (!plugin.vault().withdraw(p, pricePlayerShop)) {
+                p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.ecoError"))));
+                return true;
+            }
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("createshop.price.transactionSuccess"))));
+            p.sendMessage(Main.prefix().append(MM.deserialize(
+                    plugin.i18n().get("createshop.price.amount", String.format("%.2f€", pricePlayerShop)))));
         }
 
         Location base = look.getLocation().add(0.5, 1.0, 0.5);
-
         PlayerShop shop = plugin.shops().create(p, base, hand.clone(), amount, buy, sell);
         plugin.entities().spawnFor(shop);
+
         try { plugin.storage().saveAll(); } catch (Exception ignored) {}
 
-        Component shopCreated = MiniMessage.miniMessage().deserialize("<#1fff17>Dein Spielershop wurde erfolgreich erstellt.");
-        p.sendMessage(Main.prefix().append(shopCreated));
+        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("createshop.created"))));
         return true;
     }
 }

@@ -7,12 +7,18 @@ authors:
 description: "Spielershops – inspiriert von Cytooxien.net"
 website: "https://github.com/eindaniels/PlayerShops"
 api-version: '1.20'
+depend:
+  - Vault
 
-dependencies:
-  server:
-    Vault:
-      required: true
-      load: BEFORE
+commands:
+  createshop:
+    description: Erstellt einen neuen Spielershop.
+    usage: /createshop <Verkaufspreis> <Ankaufspreis> <Menge>
+    permission: playershop.create
+  removeshop:
+    description: Entfernt deinen Spielershop.
+    usage: /removeshop
+    permission: playershop.remove
 
 permissions:
   playershop.create:
@@ -22,5 +28,5 @@ permissions:
     description: "Erlaubt das Entfernen des eigenen Spielershops."
     default: true
   playershop.admin:
-    description: "Erlaubt Admin-Funktionen (fremde Shops entfernen)."
+    description: "Erlaubt Admin-Funktionen."
     default: op

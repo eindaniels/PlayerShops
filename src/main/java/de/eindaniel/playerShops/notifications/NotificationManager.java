@@ -3,14 +3,15 @@ package de.eindaniel.playerShops.notifications;
 import de.eindaniel.playerShops.Main;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 public class NotificationManager {
 
@@ -29,6 +30,7 @@ public class NotificationManager {
         if (player != null && player.isOnline()) {
             player.sendMessage(Main.prefix().append(message));
         } else {
+            // Offline: Nachricht speichern
             List<String> messages = config.getStringList(owner.toString());
             messages.add(MiniMessage.miniMessage().serialize(message));
             config.set(owner.toString(), messages);
@@ -37,23 +39,24 @@ public class NotificationManager {
     }
 
     public void sendPendingNotifications(Player player) {
-        UUID owner = player.getUniqueId();
-        List<String> messages = config.getStringList(owner.toString());
-        if (!messages.isEmpty()) {
-            player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<#1fff17>Während deiner Abwesenheit hast du verdient:")));
-            for (String msg : messages) {
-                player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(msg)));
-            }
-            config.set(owner.toString(), null);
-            save();
+        UUID uuid = player.getUniqueId();
+        List<String> messages = config.getStringList(uuid.toString());
+        if (messages.isEmpty()) return;
+
+        player.sendMessage(Main.prefix().append(MiniMessage.miniMessage()
+                .deserialize(Main.get().i18n().get("notification.idle"))));
+        for (String msg : messages) {
+            player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(msg)));
         }
+        config.set(uuid.toString(), null);
+        save();
     }
 
     private void save() {
         try {
             config.save(file);
         } catch (IOException e) {
-            plugin.getLogger().warning("Konnte notifications.yml nicht speichern!");
+            plugin.getLogger().warning("Konnte notifications.yml nicht speichern: " + e.getMessage());
         }
     }
 }

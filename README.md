@@ -1,111 +1,111 @@
 # ⚠️ Disclaimer
-Dies ist **nicht** das finale Plugin, sondern eine **Entwicklungs- und Testversion**.  
-Es kann sich jederzeit ändern, Funktionen können noch unvollständig sein und es gibt keine Garantie für Stabilität oder Kompatibilität.
+This is **not the final plugin**, but a **development and test version**.  
+Things may change at any time, features may be incomplete, and stability is not guaranteed.
 
 # 🛒 PlayerShops
 
-> Ein Minecraft-Plugin für **PaperMC/Spigot**, das Spielern ermöglicht, eigene Shops zu erstellen – inspiriert von den **Spielershops** auf [Cytooxien.net](https://cytooxien.net) (Reallife, SkyBlock & CitySMP).
+> A Minecraft plugin for **PaperMC/Spigot** that allows players to create their own shops – inspired by the **player shops** on Cytooxien.net (SkyBlock).
 
 ---
 
 ## ✨ Features
 
-- ⚡ Spieler können eigene Shops platzieren & verwalten
-- 📦 **Stash-System** für Shop-Besitzer (privates Lager für Handelswaren)
-- 💰 **Buy/Sell-Toggle** → Besitzer entscheidet, ob andere Spieler kaufen oder verkaufen dürfen
-- 📊 **Echtzeit-Label über dem Shop** (zeigt Angebot, Preise & Status)
-- 🔒 Automatische Rückgabe von Items bei ungültigen Einlagerungen
-- 💸 Vault-Integration für sicheres Bezahlen
-- 🖼️ Verwendet die **Minecraft Display-Entities**:
-    - `ItemDisplay` → zeigt das gehandelte Item schwebend über dem Shop
-    - `TextDisplay` → zeigt Titel, Preis & Status in einem schönen schwebenden Text
-    - `Interaction` → sorgt für Klick-Hitbox, um Shops zu öffnen
+- ⚡ Players can create and manage their own shops
+- 📦 **Stash system** for shop owners (private storage for trade items)
+- 💰 **Buy/Sell toggle** → owners can decide whether players can buy or sell
+- 📊 **Real-time label above the shop** (shows item, price & status)
+- 🔒 Automatic return of invalid items placed into the stash
+- 💸 Vault integration for secure payments
+- 🖼️ Uses modern **Minecraft Display Entities**:
+  - `ItemDisplay` → shows the item floating above the shop
+  - `TextDisplay` → displays name, price & status as floating text
+  - `Interaction` → handles click hitbox for opening the shop
 
 ---
 
-## 📋 Anforderungen
+## 📋 Requirements
 
 - **Minecraft:** 1.21+
-- **Server:** [PaperMC](https://papermc.io) (empfohlen) oder Spigot
-- **Vault:** benötigt (für Economy)
-- **Economy Plugin:** z. B. EssentialsX, CMI oder ein anderes Vault-kompatibles Plugin
+- **Server:** PaperMC (recommended) or Spigot
+- **Vault:** required (for economy)
+- **Economy Plugin:** e.g. EssentialsX, CMI or any Vault-compatible plugin
 
 ---
 
 ## 🚀 Installation
 
-1. Lade die neueste Version von **PlayerShops** herunter.
-2. Lege die `.jar`-Datei in den `plugins/`-Ordner deines Servers.
-3. Stelle sicher, dass **Vault** und ein Economy-Plugin installiert sind.
-4. Starte den Server neu.
-5. Erstelle deinen ersten Shop & genieße den Handel!
+1. Download the latest version of **PlayerShops**.
+2. Place the `.jar` file into your server's `plugins/` folder.
+3. Make sure **Vault** and an economy plugin are installed.
+4. Restart the server.
+5. Create your first shop & enjoy trading!
+
 ---
 
 ## ⚙️ Commands
 
-### 🏗️ Spieler Commands
+### 🏗️ Player Commands
 
-| Befehl                                       | Beschreibung                                                      |
-|----------------------------------------------|-------------------------------------------------------------------|
-| `/createshop <buyPrice> <sellPrice> <menge>` | Erstellt einen neuen Shop über dem Block, den du ansiehst.        |
-| `/removeshop`                                | Entfernt den Shop über dem Block, den du ansiehst (nur Besitzer). |
+| Command                                       | Description                                       |
+|-----------------------------------------------|---------------------------------------------------|
+| `/createshop <buyPrice> <sellPrice> <amount>` | Creates a shop above the block you are looking at |
+| `/removeshop`                                 | Removes the shop you are looking at (owner only)  |
 
-👉 Shops werden durch **Rechtsklick auf die Interaktion-Hitbox** geöffnet:
-- **Besitzer:** Stash-GUI (Einlagern/Verwalten)
-- **Andere Spieler:** Handels-GUI (Kaufen/Verkaufen)
+👉 Shops are opened by **right-clicking the interaction hitbox**:
+- **Owner:** Stash GUI (manage storage)
+- **Others:** Trading GUI (buy/sell)
 
 ---
 
 ## 🔑 Permissions
 
-| Permission          | Beschreibung                                              |
-|---------------------|-----------------------------------------------------------|
-| `playershop.create` | Erlaubt das Erstellen eines Shops mit `/createshop`       |
-| `playershop.remove` | Erlaubt das Entfernen des eigenen Shops mit `/removeshop` | 
+| Permission          | Description                                      |
+|---------------------|--------------------------------------------------|
+| `playershop.create` | Allows creating shops with `/createshop`         |
+| `playershop.remove` | Allows removing your own shop with `/removeshop` |
 
 ---
 
-## 📦 Konfiguration
+## 📦 Configuration
 
-- Preise & Item-Menge pro Trade können pro Shop eingestellt werden.
-- Shop-Besitzer können im **Stash-GUI**:
-    - Items einlagern / entnehmen
-    - Kaufen/Verkaufen toggeln
-    - Preise anpassen
+- Prices & item amounts can be configured per shop.
+- In the **Stash GUI**, owners can:
+  - Store / withdraw items
+  - Toggle buying and selling
+  - Change prices
 
 ---
 
 ## 🏆 Inspiration
 
-Dieses Plugin ist **inspiriert** von den **Spielershops** auf **Cytooxien.net**.  
-Besonders die Systeme aus:
-- 🏙️ **Reallife**
-- 🌌 **SkyBlock**
-- 🌆 **CitySMP**
+This plugin is **inspired** by the player shop system on **Cytooxien.net**.  
+Especially from:
+- 🌌 SkyBlock
 
-Die Idee stammt von dort – dieses Plugin ist eine **eigene Umsetzung** und keine offizielle Ressource von Cytooxien.
+This is an independent implementation and not an official Cytooxien resource.
 
 ---
 
-## 📦 Version & Infos
+## 📦 Version & Info
 
-- **Plugin-Version:** 1.0.0 (Beta)
-- **Autor:** Eindaniel
+- **Plugin Version:** 1.0.0 (Beta)
+- **Author:** eindaniel
 - **API:** PaperMC 1.20+
-- **Lizenz:** MIT (frei verwendbar & anpassbar, Credits erwünscht)
-- 
-## 💡 Idee / Mitmachen
+- **License:** MIT (free to use & modify, credits appreciated)
 
-- Ideen für neue Features?
-- Fehler gefunden?
-- Pull Requests & Issues sind willkommen!
+---
+
+## 💡 Contributing
+
+- Got ideas for new features?
+- Found a bug?
+
+Pull requests & issues are welcome!
 
 ---
 
 ## ❤️ Credits
 
-- Idee & Inspiration: **Cytooxien.net** (Spielershops)
-- Umsetzung: **eindaniels**
-- Economy-Schnittstelle: [Vault](https://www.spigotmc.org/resources/vault.34315/)
-
----
+- Idea & inspiration: Cytooxien.net
+- Development: eindaniel
+- Economy API: Vault

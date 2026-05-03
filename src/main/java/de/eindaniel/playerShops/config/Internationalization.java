@@ -35,7 +35,7 @@ public class Internationalization {
             try {
                 langConfig.save(langFile);
             } catch (IOException e) {
-                plugin.getLogger().warning("Konnte messages.yml nicht speichern: " + e.getMessage());
+                plugin.getLogger().warning("Could not save messages.yml: " + e.getMessage());
             }
         }
     }
@@ -43,7 +43,7 @@ public class Internationalization {
     public String get(String key, Object... args) {
         String value = langConfig.getString(key);
         if (value == null) {
-            plugin.getLogger().warning("[i18n] Fehlender Key: " + key);
+            plugin.getLogger().warning("[i18n] Missing key: " + key);
             return "<red>[missing: " + key + "]</red>";
         }
         for (int i = 0; i < args.length; i++) {

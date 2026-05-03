@@ -59,12 +59,13 @@ public class Main extends JavaPlugin {
 
         new VersionChecker(this, "eindaniels", "PlayerShops").check((result, latest) -> {
             if (result == VersionChecker.Result.OUTDATED) {
-                getLogger().warning("Neue Version verfügbar: " + latest);
-                getLogger().warning("Download: https://github.com/eindaniels/PlayerShops/releases/latest");
+                getLogger().warning("PlayerShop Plugin is outdated!");
+                getLogger().warning("New Version -> " + latest);
+                getLogger().warning("Download -> https://github.com/eindaniels/PlayerShops/releases/latest");
             } else if (result == VersionChecker.Result.UP_TO_DATE) {
-                getLogger().info("Plugin ist aktuell.");
+                getLogger().info("Plugin is up to date.");
             } else {
-                getLogger().warning("Plugin-Version konnte nicht geprüft werden.");
+                getLogger().warning("Couldn't check version.");
             }
         });
 
@@ -86,7 +87,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ChatInputListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(notificationManager), this);
 
-        getLogger().info("PlayerShops v" + getDescription().getVersion() + " aktiviert.");
+        getLogger().info("PlayerShops v" + getDescription().getVersion() + " activated.");
     }
 
     @Override
@@ -97,7 +98,7 @@ public class Main extends JavaPlugin {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        getLogger().info("PlayerShops deaktiviert.");
+        getLogger().info("PlayerShops deactivated.");
     }
 
     public static Component prefix() {

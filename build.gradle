@@ -10,14 +10,13 @@ version = project.findProperty('plugin_version')
 repositories {
     mavenCentral()
     maven {
-        name = "papermc-repo"
-        url = "https://repo.papermc.io/repository/maven-public/"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
     }
     maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:${paper_version}-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:${paper_version}")
     compileOnly "com.github.MilkBowl:VaultAPI:${vault_version}"
 }
 

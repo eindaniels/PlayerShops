@@ -30,7 +30,7 @@ tasks {
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion
@@ -60,7 +60,7 @@ processResources {
 shadowJar {
     archiveBaseName.set('PlayerShops')
     archiveClassifier.set('')
-    archiveVersion.set(version as String)
+    archiveVersion.set(version.toString())
     minimize()
 }
 

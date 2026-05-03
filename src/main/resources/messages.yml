@@ -1,3 +1,6 @@
+# Other translations are downloadable on this GitHub Repository: https://github.com/eindaniels/PlayerShops-i18n
+# For Translators: translate into your own language on Crowdin: https://crowdin.com/project/playershops (Contact me, if your language does not exist on crowdin)
+
 prefix: "<dark_gray>[<#ffdd00>Spielershops<dark_gray>] <reset>"
 
 noperm: "<#ff1717>Du hast keine Berechtigung für diesen Command."

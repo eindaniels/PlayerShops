@@ -13,18 +13,24 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class ChatInputHandler {
+
     private static final Map<UUID, ChatInputHandler> handlers = new HashMap<>();
+
     private final Player player;
     private final long endTime;
     private int taskId;
-    private final Consumer<String> inputConsumer; // Generischer Callback
+    private final Consumer<String> inputConsumer;
 
     public ChatInputHandler(Player player, Consumer<String> inputConsumer) {
         this.player = player;
         this.inputConsumer = inputConsumer;
-        this.endTime = System.currentTimeMillis() + 30000; // 30 Sekunden
+        this.endTime = System.currentTimeMillis() + 30_000L;
+
         handlers.put(player.getUniqueId(), this);
-        player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize("<gray>Schreibe \"<#fbecab>abbrechen<gray>\" oder \"<#fbecab>cancel<gray>\" um den Vorgang abzubrechen.")));
+
+        player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
+                "<gray>Schreibe \"<#fbecab>abbrechen<gray>\" oder \"<#fbecab>cancel<gray>\" um abzubrechen.")));
+
         startTitleTask();
     }
 
@@ -32,21 +38,23 @@ public class ChatInputHandler {
         taskId = new BukkitRunnable() {
             @Override
             public void run() {
-                long remainingTime = (endTime - System.currentTimeMillis()) / 1000;
-                if (remainingTime <= 0) {
+                long remaining = (endTime - System.currentTimeMillis()) / 1000;
+                if (remaining <= 0) {
                     player.sendTitle("", "", 0, 0, 0);
+                    ChatInputHandler.removeHandler(player);
                     cancel();
                     return;
                 }
-                final String title = LegacyComponentSerializer.legacyAmpersand()
-                        .serialize(MiniMessage.miniMessage().deserialize("<#FCC500>Chateingabe"))
-                        .replace("&", "§");
-                final String subtitle = LegacyComponentSerializer.legacyAmpersand()
-                        .serialize(MiniMessage.miniMessage().deserialize("<#fbecab>" + remainingTime + " Sekunden"))
-                        .replace("&", "§");
+                String title = toLegacy(Main.get().i18n().get("chatInput.title"));
+                String subtitle = toLegacy(Main.get().i18n().get("chatInput.subtitle", remaining));
                 player.sendTitle(title, subtitle, 0, 20, 10);
             }
-        }.runTaskTimer(Main.getPlugin(Main.class), 0, 20).getTaskId();
+        }.runTaskTimer(Main.get(), 0, 20).getTaskId();
+    }
+
+    private String toLegacy(String miniMsg) {
+        return LegacyComponentSerializer.legacySection()
+                .serialize(MiniMessage.miniMessage().deserialize(miniMsg));
     }
 
     public static ChatInputHandler getHandler(Player player) {
@@ -54,33 +62,15 @@ public class ChatInputHandler {
     }
 
     public static void removeHandler(Player player) {
-        ChatInputHandler handler = handlers.remove(player.getUniqueId());
-        if (handler != null) {
-            Bukkit.getScheduler().cancelTask(handler.taskId);
+        ChatInputHandler h = handlers.remove(player.getUniqueId());
+        if (h != null) {
+            Bukkit.getScheduler().cancelTask(h.taskId);
             player.sendTitle("", "", 0, 0, 0);
         }
     }
 
-    public boolean isExpired() {
-        return System.currentTimeMillis() > endTime;
-    }
-
-    public void setExpired() {
-        handlers.remove(player.getUniqueId());
-        Bukkit.getScheduler().cancelTask(taskId);
-        player.sendTitle("", "", 0, 0, 0);
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
     public void handleInput(String input) {
         removeHandler(player);
-
-        Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
-            inputConsumer.accept(input);
-        });
+        Bukkit.getScheduler().runTask(Main.get(), () -> inputConsumer.accept(input));
     }
-
 }

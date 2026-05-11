@@ -13,7 +13,7 @@ economy:
 shops:
   # Maximum number of shops a player can own at once
   # Set to -1 for unlimited
-  max-per-player: 5
+  max-per-player: 10
   # Price of creating a shop
   # Set to -1 for unlimited
   createshop-price: 200

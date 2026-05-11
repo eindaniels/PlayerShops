@@ -13,6 +13,7 @@ createshop.price.noMoney: "<#ff1717>Du hast nicht genug Geld für einen SpielerS
 createshop.price.transactionSuccess: "<#1fff17>Transaktion erfolgreich!"
 createshop.price.amount: "<#ff1717>- {0}"
 createshop.created: "<#1fff17>Dein Spielershop wurde erfolgreich erstellt."
+createshop.limitReached: "<#ff1717>Du hast das Limit von Spielershops erreicht. <dark_gray>(<#fbecab>{0}<dark_gray>)"
 
 removeshop.targetBlock: "<#ff1717>Ziele auf den Block unter dem Shop."
 removeshop.noShop: "<#ff1717>Hier ist kein Spielershop!"

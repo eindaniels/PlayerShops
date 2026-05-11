@@ -40,6 +40,11 @@ public class CreateShopCommand extends Command {
             return true;
         }
 
+        if (plugin.playerData().getShopAmount(p.getUniqueId()) >= 5) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("createshop.limitReached", plugin.config().get("shops.max-per-player")))));
+            return true;
+        }
+
         double buy, sell;
         int amount;
         try {
@@ -85,6 +90,8 @@ public class CreateShopCommand extends Command {
         plugin.entities().spawnFor(shop);
 
         try { plugin.storage().saveAll(); } catch (Exception ignored) {}
+
+        plugin.playerData().addShopAmount(p.getUniqueId());
 
         p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("createshop.created"))));
         return true;

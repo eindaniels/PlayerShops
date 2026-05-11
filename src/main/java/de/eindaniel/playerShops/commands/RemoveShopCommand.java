@@ -73,6 +73,8 @@ public class RemoveShopCommand extends Command {
         plugin.shops().delete(shop);
         try { plugin.storage().saveAll(); } catch (Exception ignored) {}
 
+        plugin.playerData().removeShopAmount(p.getUniqueId());
+
         p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("removeshop.removed"))));
         return true;
     }

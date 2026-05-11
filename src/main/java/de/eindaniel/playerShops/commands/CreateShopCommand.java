@@ -40,7 +40,7 @@ public class CreateShopCommand extends Command {
             return true;
         }
 
-        if (plugin.playerData().getShopAmount(p.getUniqueId()) >= 5) {
+        if (plugin.playerData().getShopAmount(p.getUniqueId()) >= plugin.config().getInt("shops.max-per-player")) {
             p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("createshop.limitReached", plugin.config().get("shops.max-per-player")))));
             return true;
         }

@@ -15,8 +15,8 @@ shops:
   # Set to -1 for unlimited
   max-per-player: 10
   # Price of creating a shop
-  # Set to -1 for unlimited
+  # Set to -1 for disabling this feature
   createshop-price: 200
   # How much Money you get refunded by removing your shop
-  # Set to -1 for unlimited
+  # Set to -1 for disabling this feature
   removeshop-refund: 175

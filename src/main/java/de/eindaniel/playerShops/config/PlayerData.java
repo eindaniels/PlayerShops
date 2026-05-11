@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 public class PlayerData {
@@ -17,8 +18,15 @@ public class PlayerData {
         this.playerDataFolder = new File(plugin.getDataFolder(), "playerdata");
         if (!playerDataFolder.exists() && !playerDataFolder.mkdirs()) {
             plugin.getLogger().warning("Playerdata folder could not be installed: " + playerDataFolder.getPath());
-        } else {
-            plugin.getLogger().info("Playerdata folder has been created: " + playerDataFolder.getPath());
+        }
+    }
+
+
+    private void saveConfig(FileConfiguration config, File file) {
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -33,14 +41,20 @@ public class PlayerData {
     }
 
     public void addShopAmount(UUID uuid) {
-        File playerFile = getPlayerFile(uuid);
-        FileConfiguration config = YamlConfiguration.loadConfiguration(playerFile);
-        config.set("shops.amount", getShopAmount(uuid)+1);
+        try {
+            File playerFile = getPlayerFile(uuid);
+            FileConfiguration config = YamlConfiguration.loadConfiguration(playerFile);
+            config.set("shops.amount", getShopAmount(uuid)+1);
+            saveConfig(config, playerFile);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void removeShopAmount(UUID uuid) {
         File playerFile = getPlayerFile(uuid);
         FileConfiguration config = YamlConfiguration.loadConfiguration(playerFile);
         config.set("shops.amount", getShopAmount(uuid)-1);
+        saveConfig(config, playerFile);
     }
 }

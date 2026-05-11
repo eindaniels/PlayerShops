@@ -64,7 +64,7 @@ public class CreateShopCommand extends Command {
             return true;
         }
 
-        double pricePlayerShop = plugin.config().getDouble("price-playershops", 0);
+        double pricePlayerShop = plugin.config().getDouble("shops.createshop-price", 0);
         if (pricePlayerShop > 0) {
             if (!plugin.vault().has(p, pricePlayerShop)) {
                 p.sendMessage(Main.prefix().append(MM.deserialize(

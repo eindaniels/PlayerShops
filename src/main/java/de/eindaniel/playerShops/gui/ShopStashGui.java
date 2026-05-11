@@ -56,13 +56,13 @@ public class ShopStashGui {
         // Change Sell Price (Slot 36)
         inv.setItem(36, buildNameTag(
                 plugin.i18n().get("shopStashGui.changeSellPrice"),
-                plugin.i18n().get("shopStashGui.currentSellPrice", String.format("%.2f", shop.getSellPrice()))
+                plugin.i18n().get("shopStashGui.currentSellPrice", String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), shop.getSellPrice()))
         ));
 
         // Change Buy Price (Slot 37)
         inv.setItem(37, buildNameTag(
                 plugin.i18n().get("shopStashGui.changeBuyPrice"),
-                plugin.i18n().get("shopStashGui.currentBuyPrice", String.format("%.2f", shop.getBuyPrice()))
+                plugin.i18n().get("shopStashGui.currentBuyPrice", String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), shop.getBuyPrice()))
         ));
 
         // Change Amount (Slot 38)

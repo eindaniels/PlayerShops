@@ -1,5 +1,22 @@
-# Falls man einen Preis haben möchte, um den /createshop ... Command auszuführen. Standart: 200
-price-playershops: 200
+# -----------------------------------------------
+# PlayerShops Configuration
+# Author: eindaniel
+# Version: 1.0-beta.11
+# -----------------------------------------------
 
-# Falls man nun /removeshop eingibt, erhält man 150 zu seinem Kontostand dazu. Standart: 150
-refund-playershops: 150
+# Economy settings
+economy:
+  # Currency symbol shown in GUIs and labels
+  currency-symbol: "$"
+
+# Shop settings
+shops:
+  # Maximum number of shops a player can own at once
+  # Set to -1 for unlimited
+  max-per-player: 5
+  # Price of creating a shop
+  # Set to -1 for unlimited
+  createshop-price: 200
+  # How much Money you get refunded by removing your shop
+  # Set to -1 for unlimited
+  removeshop-refund: 175

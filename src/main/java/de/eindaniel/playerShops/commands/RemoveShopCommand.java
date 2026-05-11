@@ -61,7 +61,7 @@ public class RemoveShopCommand extends Command {
             return true;
         }
 
-        double refundPrice = plugin.config().getDouble("refund-playershops", 0);
+        double refundPrice = plugin.config().getDouble("shops.removeshop-refund", 0);
         if (refundPrice > 0) {
             plugin.vault().deposit(p, refundPrice);
             p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("removeshop.price.transactionSuccess"))));

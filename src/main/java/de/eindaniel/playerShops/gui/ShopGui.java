@@ -45,7 +45,7 @@ public class ShopGui implements InventoryHolder {
             bm.displayName(MM.deserialize(Main.get().i18n().get("shopGui.buyItem.title"))
                     .decoration(TextDecoration.ITALIC, false));
             bm.lore(List.of(MM.deserialize(Main.get().i18n().get("shopGui.buyItem.lore",
-                    String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), shop.getBuyPrice())))
+                    String.format("%.2f" + Main.get().config().get("economy.currency-symbol", "$"), shop.getBuyPrice())))
                     .decoration(TextDecoration.ITALIC, false)));
             buy.setItemMeta(bm);
             inv.setItem(11, buy);
@@ -57,7 +57,7 @@ public class ShopGui implements InventoryHolder {
             sm.displayName(MM.deserialize(Main.get().i18n().get("shopGui.sellItem.title"))
                     .decoration(TextDecoration.ITALIC, false));
             sm.lore(List.of(MM.deserialize(Main.get().i18n().get("shopGui.sellItem.lore",
-                    String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), shop.getSellPrice())))
+                    String.format("%.2f" + Main.get().config().get("economy.currency-symbol", "$"), shop.getSellPrice())))
                     .decoration(TextDecoration.ITALIC, false)));
             sell.setItemMeta(sm);
             inv.setItem(15, sell);

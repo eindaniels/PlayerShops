@@ -19,7 +19,6 @@ public class ShopGui implements InventoryHolder {
     private static final MiniMessage MM = MiniMessage.miniMessage();
 
     private final PlayerShop shop;
-    private final Main plugin;
 
     private final Inventory inv;
 

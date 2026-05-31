@@ -148,10 +148,10 @@ public class InteractionListener implements Listener {
 
         p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.transactionSuccess"))));
         p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.gotBlocks", taken, shop.getDisplayItem().translationKey()))));
-        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.tookMoney", String.format("%.2f€", price)))));
+        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.tookMoney", String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), price)))));
 
         plugin.notifications().notifyShopOwner(shop.getOwner(),
-                MM.deserialize(plugin.i18n().get("interaction.notificationBuy", p.getName(), String.format("%.2f", price))));
+                MM.deserialize(plugin.i18n().get("interaction.notificationBuy", p.getName(), String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), price))));
 
         updateAndSave(shop);
     }
@@ -193,10 +193,10 @@ public class InteractionListener implements Listener {
 
         p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.transactionSuccess"))));
         p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.tookBlocks", need, shop.getDisplayItem().translationKey()))));
-        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.gotMoney", String.format("%.2f€", price)))));
+        p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.gotMoney", String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), price)))));
 
         plugin.notifications().notifyShopOwner(shop.getOwner(),
-                MM.deserialize(plugin.i18n().get("interaction.notificationSell", p.getName(), String.format("%.2f", price))));
+                MM.deserialize(plugin.i18n().get("interaction.notificationSell", p.getName(), String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), price))));
 
         updateAndSave(shop);
     }

@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'com.gradleup.shadow' version '9.4.1'
-    id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
 group = 'de.eindaniel'
@@ -23,10 +23,9 @@ dependencies {
 tasks {
     runServer {
         downloadPlugins {
-            github("EssentialsX", "Essentials", "2.21.2", "EssentialsX-2.21.2.jar")
             github("MilkBowl", "Vault", "1.7.3", "Vault.jar")
         }
-        minecraftVersion(paper_version)
+        minecraftVersion("26.1.2")
     }
 }
 

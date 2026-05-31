@@ -8,25 +8,29 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ShopGui {
+public class ShopGui implements InventoryHolder {
 
     private static final MiniMessage MM = MiniMessage.miniMessage();
 
     private final PlayerShop shop;
     private final Main plugin;
 
-    public ShopGui(PlayerShop shop, Main plugin) {
+    private final Inventory inv;
+
+    public ShopGui(PlayerShop shop) {
         this.shop = shop;
-        this.plugin = plugin;
+        this.inv = this.build();
     }
 
     public Inventory build() {
         String title = Main.get().i18n().get("shopGui.title");
-        Inventory inv = GuiTitleUtil.createCenteredInventory(27, title);
+        Inventory inv = GuiTitleUtil.createCenteredInventory(this, 27, title);
 
         ItemStack core = shop.getDisplayItem().clone();
         var cm = core.getItemMeta();
@@ -65,9 +69,21 @@ public class ShopGui {
 
     public PlayerShop getShop() { return shop; }
 
+    /**
+     * @deprecated Checking for inventory names is highly insecure and thus prone to exploits.
+     * Use <code>instanceof</code> instead
+     * @param title the inventory's title
+     * @return if the title is the pre-defined shop title
+     */
+    @Deprecated(forRemoval = true)
     public static boolean isShop(Component title) {
         if (title == null) return false;
         return GuiTitleUtil.getRawTitle(title).contains(
                 Main.get().i18n().get("shopGui.title"));
+    }
+
+    @Override
+    public @NotNull Inventory getInventory() {
+        return this.inv;
     }
 }

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 
 /**
  * Utility to center inventory titles in Minecraft (pixel-perfect approximation).
@@ -42,12 +43,12 @@ public final class GuiTitleUtil {
     /**
      * Create an inventory with a centered title (preserves formatting if you pass a Component).
      */
-    public static Inventory createCenteredInventory(int size, Component title) {
-        return Bukkit.createInventory(null, size, centerComponent(title));
+    public static Inventory createCenteredInventory(InventoryHolder owner, int size, Component title) {
+        return Bukkit.createInventory(owner, size, centerComponent(title));
     }
 
-    public static Inventory createCenteredInventory(int size, String title) {
-        return Bukkit.createInventory(null, size, center(title));
+    public static Inventory createCenteredInventory(InventoryHolder owner, int size, String title) {
+        return Bukkit.createInventory(owner, size, center(title));
     }
 
     /**

@@ -29,8 +29,8 @@ public class InteractionListener implements Listener {
     private static final int
         TOGGLE_SELL         = 43,
         TOGGLE_BUY          = 44,
-        CHANGE_BUY_PRICE    = 36,
-        CHANGE_SELL_PRICE   = 37,
+        CHANGE_SELL_PRICE   = 36,
+        CHANGE_BUY_PRICE    = 37,
         CHANGE_AMOUNT       = 38;
 
     private final Main plugin;
@@ -219,7 +219,7 @@ public class InteractionListener implements Listener {
                         try {
                             double price = Double.parseDouble(input);
                             if (price < 0) throw new NumberFormatException();
-                            shop.setSellPrice(price);
+                            shop.setBuyPrice(price);
                             p.sendMessage(Main.prefix().append(MM.deserialize(
                                     plugin.i18n().get("interaction.chatInput.changedBuyPrice", price))));
                             updateAndSave(shop);
@@ -235,7 +235,7 @@ public class InteractionListener implements Listener {
                         try {
                             double price = Double.parseDouble(input);
                             if (price < 0) throw new NumberFormatException();
-                            shop.setBuyPrice(price);
+                            shop.setSellPrice(price);
                             p.sendMessage(Main.prefix().append(MM.deserialize(
                                     plugin.i18n().get("interaction.chatInput.changedSellPrice", price))));
                             updateAndSave(shop);

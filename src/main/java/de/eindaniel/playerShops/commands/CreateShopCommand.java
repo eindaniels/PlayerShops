@@ -19,14 +19,14 @@ public class CreateShopCommand extends Command {
     public CreateShopCommand(Main plugin) {
         super("createshop");
         this.plugin = plugin;
-        setDescription("Erstellt einen neuen Spielershop.");
+        setDescription("Creates a new PlayerShop.");
         setPermission("playershop.create");
     }
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player p)) {
-            sender.sendMessage("Nur Spieler können diesen Befehl nutzen.");
+            sender.sendMessage("Only players can use this command.");
             return true;
         }
 

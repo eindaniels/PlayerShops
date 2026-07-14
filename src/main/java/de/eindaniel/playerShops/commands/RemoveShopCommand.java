@@ -18,14 +18,14 @@ public class RemoveShopCommand extends Command {
     public RemoveShopCommand(Main plugin) {
         super("removeshop");
         this.plugin = plugin;
-        setDescription("Entfernt deinen Spielershop.");
+        setDescription("Removes your PlayerShop");
         setPermission("playershop.remove");
     }
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player p)) {
-            sender.sendMessage("Nur Spieler können diesen Befehl nutzen.");
+            sender.sendMessage("Only players can use this command.");
             return true;
         }
 

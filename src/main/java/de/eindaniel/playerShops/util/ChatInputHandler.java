@@ -21,6 +21,12 @@ public class ChatInputHandler {
     private int taskId;
     private final Consumer<String> inputConsumer;
 
+    /**
+     * @deprecated Now using <code>DialogInputHandler</code> instead of this.
+     * @param player The player, that is going to get this ChatInput.
+     * @param inputConsumer The callback, that processes the input
+     */
+    @Deprecated(forRemoval = true)
     public ChatInputHandler(Player player, Consumer<String> inputConsumer) {
         this.player = player;
         this.inputConsumer = inputConsumer;

@@ -25,10 +25,10 @@ removeshop.removed: "<#1fff17>Dein Shop wurde erfolgreich entfernt."
 
 shop.label: "<gray>{0}x <white><lang:{1}>\n{2}\n{3}<reset>"
 # {2} and {3} is buyEnabled or disabled and sellEnabled or disabled.
-shop.buyEnabled: "<#fbecab>Verkauf: <#a3ff2b>{0}"
-shop.buyDisabled: "<#ff1717><st>Verkauf: {0}<reset>"
-shop.sellEnabled: "<#fbecab>Ankauf: <#a3ff2b>{0}"
-shop.sellDisabled: "<#ff1717><st>Ankauf: {0}<reset>"
+shop.buyEnabled: "<#fbecab>Ankauf: <#a3ff2b>{0}"
+shop.buyDisabled: "<#ff1717><st>Ankauf: {0}<reset>"
+shop.sellEnabled: "<#fbecab>Verkauf: <#a3ff2b>{0}"
+shop.sellDisabled: "<#ff1717><st>Verkauf: {0}<reset>"
 
 shopGui.title: "Kauf abschließen"
 shopGui.selledItem: "<gray>{0}x <white><lang:{1}>"
@@ -65,7 +65,7 @@ interaction.notificationBuy: "<#1fff17>{0} hat für {1} in einer deiner Shops ei
 interaction.notEnoughBlocks: "<#ff1717>Du hast nicht genug <lang:{0}>."
 interaction.noMoneyOwner: "<#ff1717>Der Shop-Besitzer hat nicht genug Geld!"
 interaction.ecoError2: "<#ff1717>Die Auszahlung ist fehlgeschlagen, bitte melde dies einem Entwickler."
-interaction.notificationSell: "<#1fff17>{0} hat in einer deiner Shops {0} erhalten. (Verkauf)"
+interaction.notificationSell: "<#1fff17>{0} hat in einer deiner Shops {1} erhalten. (Verkauf)"
 interaction.stashFull: "<#ff1717>Zu viele Items im Shop-Lager!"
 interaction.tookBlocks: "<#ff1717>- <gray>{0}x <white><lang:{1}>"
 interaction.gotMoney: "<#a3ff2b>+ {0}"

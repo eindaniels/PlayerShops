@@ -6,6 +6,7 @@ import de.eindaniel.playerShops.gui.ShopGui;
 import de.eindaniel.playerShops.gui.ShopStashGui;
 import de.eindaniel.playerShops.shop.PlayerShop;
 import de.eindaniel.playerShops.util.ChatInputHandler;
+import de.eindaniel.playerShops.util.DialogInputHandler;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -214,6 +215,7 @@ public class InteractionListener implements Listener {
                 updateAndSave(shop);
             }
             case CHANGE_BUY_PRICE -> promptChatInput(p,
+                    plugin.i18n().get("interaction.dialogInput.newBuyPriceTitle"),
                     plugin.i18n().get("interaction.chatInput.newBuyPrice"),
                     input -> {
                         try {
@@ -227,9 +229,10 @@ public class InteractionListener implements Listener {
                             p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.chatInput.wrongInt"))));
                         }
                         Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
-                    })
+                    }, plugin)
             ;
             case CHANGE_SELL_PRICE -> promptChatInput(p,
+                    plugin.i18n().get("interaction.dialogInput.newSellPriceTitle"),
                     plugin.i18n().get("interaction.chatInput.newSellPrice"),
                     input -> {
                         try {
@@ -243,9 +246,10 @@ public class InteractionListener implements Listener {
                             p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.chatInput.wrongInt"))));
                         }
                         Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
-                    })
+                    }, plugin)
             ;
             case CHANGE_AMOUNT -> promptChatInput(p,
+                    plugin.i18n().get("interaction.dialogInput.newAmountTitle"),
                     plugin.i18n().get("interaction.chatInput.newAmount"),
                     input -> {
                         try {
@@ -259,15 +263,14 @@ public class InteractionListener implements Listener {
                             p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.chatInput.wrongInt"))));
                         }
                         Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
-                    })
+                    }, plugin)
             ;
         }
     }
 
-    private void promptChatInput(Player p, String prompt, java.util.function.Consumer<String> callback) {
+    private void promptChatInput(Player p, String prompt, String description, java.util.function.Consumer<String> callback, Main plugin) {
         p.closeInventory();
-        p.sendMessage(Main.prefix().append(MM.deserialize(prompt)));
-        new ChatInputHandler(p, callback);
+        new DialogInputHandler(p, callback, prompt, description, plugin);
     }
 
     private void refreshStashSlot(Player p, PlayerShop shop, int slot) {

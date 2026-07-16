@@ -5,7 +5,6 @@ import de.eindaniel.playerShops.exceptions.StashFullException;
 import de.eindaniel.playerShops.gui.ShopGui;
 import de.eindaniel.playerShops.gui.ShopStashGui;
 import de.eindaniel.playerShops.shop.PlayerShop;
-import de.eindaniel.playerShops.util.ChatInputHandler;
 import de.eindaniel.playerShops.util.DialogInputHandler;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -214,53 +213,53 @@ public class InteractionListener implements Listener {
                 refreshStashSlot(p, shop, 44);
                 updateAndSave(shop);
             }
-            case CHANGE_BUY_PRICE -> promptChatInput(p,
+            case CHANGE_BUY_PRICE -> promptDialogInput(p,
                     plugin.i18n().get("interaction.dialogInput.newBuyPriceTitle"),
-                    plugin.i18n().get("interaction.chatInput.newBuyPrice"),
+                    plugin.i18n().get("interaction.dialogInput.newBuyPrice"),
                     input -> {
                         try {
                             double price = Double.parseDouble(input);
                             if (price < 0) throw new NumberFormatException();
                             shop.setBuyPrice(price);
                             p.sendMessage(Main.prefix().append(MM.deserialize(
-                                    plugin.i18n().get("interaction.chatInput.changedBuyPrice", price))));
+                                    plugin.i18n().get("interaction.dialogInput.changedBuyPrice", price))));
                             updateAndSave(shop);
                         } catch (NumberFormatException ex) {
-                            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.chatInput.wrongInt"))));
+                            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.dialogInput.wrongInt"))));
                         }
                         Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
                     }, plugin)
             ;
-            case CHANGE_SELL_PRICE -> promptChatInput(p,
+            case CHANGE_SELL_PRICE -> promptDialogInput(p,
                     plugin.i18n().get("interaction.dialogInput.newSellPriceTitle"),
-                    plugin.i18n().get("interaction.chatInput.newSellPrice"),
+                    plugin.i18n().get("interaction.dialogInput.newSellPrice"),
                     input -> {
                         try {
                             double price = Double.parseDouble(input);
                             if (price < 0) throw new NumberFormatException();
                             shop.setSellPrice(price);
                             p.sendMessage(Main.prefix().append(MM.deserialize(
-                                    plugin.i18n().get("interaction.chatInput.changedSellPrice", price))));
+                                    plugin.i18n().get("interaction.dialogInput.changedSellPrice", price))));
                             updateAndSave(shop);
                         } catch (NumberFormatException ex) {
-                            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.chatInput.wrongInt"))));
+                            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.dialogInput.wrongInt"))));
                         }
                         Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
                     }, plugin)
             ;
-            case CHANGE_AMOUNT -> promptChatInput(p,
+            case CHANGE_AMOUNT -> promptDialogInput(p,
                     plugin.i18n().get("interaction.dialogInput.newAmountTitle"),
-                    plugin.i18n().get("interaction.chatInput.newAmount"),
+                    plugin.i18n().get("interaction.dialogInput.newAmount"),
                     input -> {
                         try {
                             int amount = Integer.parseInt(input);
                             if (amount <= 0) throw new NumberFormatException();
                             shop.setAmountPerTrade(amount);
                             p.sendMessage(Main.prefix().append(MM.deserialize(
-                                    plugin.i18n().get("interaction.chatInput.changedAmount", amount))));
+                                    plugin.i18n().get("interaction.dialogInput.changedAmount", amount))));
                             updateAndSave(shop);
                         } catch (NumberFormatException ex) {
-                            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.chatInput.wrongInt"))));
+                            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("interaction.dialogInput.wrongInt"))));
                         }
                         Bukkit.getScheduler().runTask(plugin, () -> new ShopStashGui(plugin, shop).openFor(p));
                     }, plugin)
@@ -268,7 +267,7 @@ public class InteractionListener implements Listener {
         }
     }
 
-    private void promptChatInput(Player p, String prompt, String description, java.util.function.Consumer<String> callback, Main plugin) {
+    private void promptDialogInput(Player p, String prompt, String description, java.util.function.Consumer<String> callback, Main plugin) {
         p.closeInventory();
         new DialogInputHandler(p, callback, prompt, description, plugin);
     }

@@ -109,11 +109,11 @@ public class ShopEntityManager {
         String item  = shop.getDisplayItem().translationKey();
         int    amt   = shop.getAmountPerTrade();
         String buy   = shop.isBuyEnabled()
-                ? plugin.i18n().get("shop.buyEnabled",  String.format("%.2f", shop.getBuyPrice()))
-                : plugin.i18n().get("shop.buyDisabled", String.format("%.2f", shop.getBuyPrice()));
+                ? plugin.i18n().get("shop.buyEnabled",  String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), shop.getBuyPrice()))
+                : plugin.i18n().get("shop.buyDisabled", String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), shop.getBuyPrice()));
         String sell  = shop.isSellEnabled()
-                ? plugin.i18n().get("shop.sellEnabled",  String.format("%.2f", shop.getSellPrice()))
-                : plugin.i18n().get("shop.sellDisabled", String.format("%.2f", shop.getSellPrice()));
+                ? plugin.i18n().get("shop.sellEnabled",  String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), shop.getSellPrice()))
+                : plugin.i18n().get("shop.sellDisabled", String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), shop.getSellPrice()));
 
         String label = plugin.i18n().get("shop.label", amt, item, buy, sell);
         return MM.deserialize(label);

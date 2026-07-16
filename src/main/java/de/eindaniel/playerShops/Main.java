@@ -3,6 +3,7 @@ package de.eindaniel.playerShops;
 import de.eindaniel.playerShops.commands.CreateShopCommand;
 import de.eindaniel.playerShops.commands.RemoveShopCommand;
 import de.eindaniel.playerShops.config.Internationalization;
+import de.eindaniel.playerShops.config.PlayerData;
 import de.eindaniel.playerShops.economy.VaultHook;
 import de.eindaniel.playerShops.entity.ShopEntityManager;
 import de.eindaniel.playerShops.listener.ChatInputListener;
@@ -18,6 +19,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
@@ -30,6 +32,7 @@ public class Main extends JavaPlugin {
     private ShopEntityManager entityManager;
     private NotificationManager notificationManager;
     private Internationalization i18n;
+    private PlayerData playerData;
 
     public static Main get() { return instance; }
     public VaultHook vault() { return vault; }
@@ -39,6 +42,7 @@ public class Main extends JavaPlugin {
     public NotificationManager notifications() { return notificationManager; }
     public Internationalization i18n() { return i18n; }
     public FileConfiguration config() { return getConfig(); }
+    public PlayerData playerData() { return playerData; }
 
     @Override
     public void onEnable() {
@@ -46,7 +50,7 @@ public class Main extends JavaPlugin {
         saveDefaultConfig();
 
         i18n = new Internationalization(this);
-
+        playerData = new PlayerData(this);
         notificationManager = new NotificationManager(this);
 
         vault = new VaultHook(this);

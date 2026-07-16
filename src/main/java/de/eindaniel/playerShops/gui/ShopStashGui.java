@@ -9,28 +9,30 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ShopStashGui {
+public class ShopStashGui implements InventoryHolder {
 
     private static final MiniMessage MM = MiniMessage.miniMessage();
 
-    public static final Map<UUID, String> OPEN = new ConcurrentHashMap<>();
-
     private final Main plugin;
     private final PlayerShop shop;
+    private final Inventory inv;
 
     public ShopStashGui(Main plugin, PlayerShop shop) {
         this.plugin = plugin;
         this.shop = shop;
+        this.inv = this.build();
     }
 
     public Inventory build() {
         String title = plugin.i18n().get("shopStashGui.title");
-        Inventory inv = GuiTitleUtil.createCenteredInventory(45, title);
+        Inventory inv = GuiTitleUtil.createCenteredInventory(this, 45, title);
 
         // Stash-Items (Slots 0–35)
         int idx = 0;
@@ -56,13 +58,13 @@ public class ShopStashGui {
         // Change Sell Price (Slot 36)
         inv.setItem(36, buildNameTag(
                 plugin.i18n().get("shopStashGui.changeSellPrice"),
-                plugin.i18n().get("shopStashGui.currentSellPrice", String.format("%.2f", shop.getSellPrice()))
+                plugin.i18n().get("shopStashGui.currentSellPrice", String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), shop.getSellPrice()))
         ));
 
         // Change Buy Price (Slot 37)
         inv.setItem(37, buildNameTag(
                 plugin.i18n().get("shopStashGui.changeBuyPrice"),
-                plugin.i18n().get("shopStashGui.currentBuyPrice", String.format("%.2f", shop.getBuyPrice()))
+                plugin.i18n().get("shopStashGui.currentBuyPrice", String.format("%.2f" + plugin.config().get("economy.currency-symbol", "$"), shop.getBuyPrice()))
         ));
 
         // Change Amount (Slot 38)
@@ -75,10 +77,16 @@ public class ShopStashGui {
     }
 
     public void openFor(Player player) {
-        OPEN.put(player.getUniqueId(), shop.key());
-        player.openInventory(build());
+        player.openInventory(this.inv);
     }
 
+    /**
+     * @deprecated Checking for inventory names is highly insecure and thus prone to exploits.
+     * Use <code>instanceof</code> instead
+     * @param title the inventory's title
+     * @return if the title is the pre-defined shop stash title
+     */
+    @Deprecated
     public static boolean isStash(Component title) {
         if (title == null) return false;
         return GuiTitleUtil.getRawTitle(title).contains(
@@ -125,4 +133,12 @@ public class ShopStashGui {
         item.setItemMeta(meta);
         return item;
     }
+
+    @Override
+    public @NotNull Inventory getInventory() {
+        return this.inv;
+    }
+
+    public PlayerShop getShop() { return shop; }
+
 }

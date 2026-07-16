@@ -15,9 +15,12 @@ public class VaultHook {
 
     public boolean hook() {
         if (plugin.getServer().getPluginManager().getPlugin("Vault") == null) return false;
+
         RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
+
         if (rsp == null) return false;
         economy = rsp.getProvider();
+
         return economy != null;
     }
 

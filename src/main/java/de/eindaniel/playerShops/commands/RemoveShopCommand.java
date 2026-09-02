@@ -51,6 +51,8 @@ public class RemoveShopCommand extends Command {
 
         PlayerShop shop = shopOpt.get();
 
+        // Todo: Admin are allowed to force-delete any shops.
+
         if (!shop.getOwner().equals(p.getUniqueId())) {
             p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("removeshop.notOwner"))));
             return true;

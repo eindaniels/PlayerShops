@@ -26,7 +26,7 @@ public class PlayerData {
         try {
             config.save(file);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 

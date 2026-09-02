@@ -1,7 +1,7 @@
 # Other translations are downloadable on this GitHub Repository: https://github.com/eindaniels/PlayerShops-i18n
 # For Translators: translate into your own language on Crowdin: https://crowdin.com/project/playershops (Contact me, if your language does not exist on crowdin)
 
-prefix: "<dark_gray>[<#ffdd00>Spielershops<dark_gray>] <reset>"
+prefix: "<dark_gray>[<#ffdd00>PlayerShops<dark_gray>] <reset>"
 
 noperm: "<#ff1717>Du hast keine Berechtigung für diesen Command."
 
@@ -89,3 +89,10 @@ dialogInput.cancel: "Abbrechen"
 dialogInput.actualCancel: "Klicke um abzubrechen"
 dialogInput.error: "<red>Ein Fehler ist aufgetreten!"
 dialogInput.inputError: "<red>Bitte gib eine gültige Eingabe ein!"
+
+mainCommand.usage: "<gray>Richtige Verwendung <dark_gray>→ <#fbecab>/playershops <reload|reloadEntities|help|info|version>"
+mainCommand.reload.success: "<#1fff17>Alle Konfigurationen wurden erfolgreich neugeladen."
+mainCommand.reload.failure: "<#ff1717>Beim Neuladen ist ein Fehler aufgetreten."
+mainCommand.version.outdated: "<gray>Aktuelle Version <dark_gray>- <#fbecab>v{0} <#ff1717>(Die Build-Version ist veraltet! Neuste Version: v{1})"
+mainCommand.version.uptodate: "<gray>Aktuelle Version <dark_gray>- <#fbecab>v{0} <#1fff17>(Up to date)"
+mainCommand.version.failed: "<gray>Aktuelle Version <dark_gray>- <#fbecab>{0} <#ff1717>(Konnte Version nicht überprüfen)"

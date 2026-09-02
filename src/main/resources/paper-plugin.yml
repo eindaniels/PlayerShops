@@ -3,8 +3,8 @@ version: '${version}'
 main: de.eindaniel.playerShops.Main
 authors:
   - eindaniel
-  - Cytooxien (Idee)
-description: "Spielershops – inspiriert von Cytooxien.net"
+  - Cytooxien (Idea)
+description: "PlayerShops – inspired from Cytooxien.net"
 website: "https://github.com/eindaniels/PlayerShops"
 api-version: '1.20'
 
@@ -16,11 +16,11 @@ dependencies:
 
 permissions:
   playershop.create:
-    description: "Erlaubt das Erstellen eines Spielershops."
+    description: "Allows the creation of an PlayerShop."
     default: true
   playershop.remove:
-    description: "Erlaubt das Entfernen des eigenen Spielershops."
+    description: "Allows the deletion of an PlayerShop"
     default: true
   playershop.admin:
-    description: "Erlaubt Admin-Funktionen (fremde Shops entfernen)."
+    description: "Allows Admin-Features (Removing others Shops)"
     default: op

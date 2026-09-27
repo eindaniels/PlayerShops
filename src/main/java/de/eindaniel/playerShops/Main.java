@@ -1,6 +1,7 @@
 package de.eindaniel.playerShops;
 
 import de.eindaniel.playerShops.commands.CreateShopCommand;
+import de.eindaniel.playerShops.commands.MasterCommand;
 import de.eindaniel.playerShops.commands.RemoveShopCommand;
 import de.eindaniel.playerShops.config.Internationalization;
 import de.eindaniel.playerShops.config.PlayerData;
@@ -85,6 +86,7 @@ public class Main extends JavaPlugin {
         CommandMap commandMap = Bukkit.getCommandMap();
         commandMap.register("playershops", new CreateShopCommand(this));
         commandMap.register("playershops", new RemoveShopCommand(this));
+        commandMap.register("playershops", new MasterCommand(this));
 
         getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
         getServer().getPluginManager().registerEvents(new ProtectionListener(), this);

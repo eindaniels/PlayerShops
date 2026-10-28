@@ -1,7 +1,6 @@
 package de.eindaniel.playerShops.commands;
 
 import de.eindaniel.playerShops.Main;
-import de.eindaniel.playerShops.config.Internationalization;
 import de.eindaniel.playerShops.util.VersionChecker;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
@@ -9,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.text.html.MinimalHTMLWriter;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,16 +43,23 @@ public class MasterCommand extends Command {
                 }
                 break;
             case "info":
-                player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(plugin.i18n().get("mainCommand.info"))));
+                player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(plugin.i18n().get("mainCommand.info", plugin.i18n().get("prefix")))));
                 break;
             case "version":
-                new VersionChecker(plugin, "eindaniels", "PlayerShops").check((result, latest) -> {
+                new VersionChecker(plugin, "eindaniels", "PlayerShops", true).check((result, latest) -> {
+                    String current = getCurrentVersion();
+                    String currentColor = colorFor(current);
+
                     if (result == VersionChecker.Result.OUTDATED) {
-                        player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(plugin.i18n().get("mainCommand.version.outdated", result, latest))));
+                        String latestColor = colorFor(latest);
+                        player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
+                                plugin.i18n().get("mainCommand.version.outdated", currentColor, current, latestColor, latest))));
                     } else if (result == VersionChecker.Result.UP_TO_DATE) {
-                        player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(plugin.i18n().get("mainCommand.version.uptodate", result))));
+                        player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
+                                plugin.i18n().get("mainCommand.version.uptodate", currentColor, current))));
                     } else {
-                        player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(plugin.i18n().get("mainCommand.version.failed", result))));
+                        player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(
+                                plugin.i18n().get("mainCommand.version.failed", currentColor, current))));
                     }
                 });
                 break;
@@ -72,5 +77,26 @@ public class MasterCommand extends Command {
             return List.of("reload", "version", "info");
         }
         return Collections.emptyList();
+    }
+
+    public String getCurrentVersion() {
+        return plugin.getDescription().getVersion().replaceFirst("^[vV]", "");
+    }
+
+    private String colorFor(String version) {
+        String channel = "stable"; // kein Channel angegeben = stable
+        for (String token : version.toLowerCase().split("[-.+]")) {
+            switch (token) {
+                case "alpha":
+                case "beta":
+                case "rc":
+                case "stable":
+                    channel = token;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return plugin.i18n().get("versioning." + channel);
     }
 }

@@ -49,7 +49,9 @@ Things may change at any time, features may be incomplete, and stability is not 
 | Command                                       | Description                                       |
 |-----------------------------------------------|---------------------------------------------------|
 | `/createshop <buyPrice> <sellPrice> <amount>` | Creates a shop above the block you are looking at |
-| `/removeshop`                                 | Removes the shop you are looking at (owner only)  |
+| `/removeshop`                                 | Removes the shop you are looking at               |
+| `/pshops <info/reload/version)`               | Main-Command for Changes and useful info          |
+| `/forcedeleteshop`                            | Removes any shop you are looking at               |
 
 👉 Shops are opened by **right-clicking the interaction hitbox**:
 - **Owner:** Stash GUI (manage storage)
@@ -59,10 +61,11 @@ Things may change at any time, features may be incomplete, and stability is not 
 
 ## 🔑 Permissions
 
-| Permission          | Description                                      |
-|---------------------|--------------------------------------------------|
-| `playershop.create` | Allows creating shops with `/createshop`         |
-| `playershop.remove` | Allows removing your own shop with `/removeshop` |
+| Permission               | Description                                       |
+|--------------------------|---------------------------------------------------|
+| `playershop.create`      | Allows creating shops with `/createshop`          |
+| `playershop.remove`      | Allows removing your own shop with `/removeshop`  |
+| `playershop.forcedelete` | Allows removing any shops with `/forcedeleteshop` |
 
 ---
 

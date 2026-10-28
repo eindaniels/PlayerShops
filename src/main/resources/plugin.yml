@@ -17,6 +17,9 @@ commands:
   removeshop:
     description: Removes your PlayerShop.
     permission: playershop.remove
+  forcedeleteshop:
+    description: Deletes any Shop
+    permission: playershop.forcedelete
 
 permissions:
   playershop.create:
@@ -25,6 +28,6 @@ permissions:
   playershop.remove:
     description: "Allows the deletion of an PlayerShop"
     default: true
-  playershop.admin:
-    description: "Allows Admin-Features (Removing others Shops)"
+  playershop.forcedelete:
+    description: "Allows removing others Shops"
     default: op

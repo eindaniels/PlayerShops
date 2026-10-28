@@ -1,10 +1,7 @@
 package de.eindaniel.playerShops.shop;
 
 import de.eindaniel.playerShops.Main;
-import de.eindaniel.playerShops.entity.ShopEntityManager;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,8 +29,8 @@ public class ShopManager {
         return shop;
     }
 
-    public boolean delete(PlayerShop shop) {
-        return shops.remove(shop.key()) != null;
+    public void delete(PlayerShop shop) {
+        shops.remove(shop.key());
     }
 
     public void put(PlayerShop shop) { shops.put(shop.key(), shop); }

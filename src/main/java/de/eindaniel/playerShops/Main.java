@@ -1,6 +1,8 @@
 package de.eindaniel.playerShops;
 
 import de.eindaniel.playerShops.commands.CreateShopCommand;
+import de.eindaniel.playerShops.commands.ForceDeleteShop;
+import de.eindaniel.playerShops.commands.MasterCommand;
 import de.eindaniel.playerShops.commands.RemoveShopCommand;
 import de.eindaniel.playerShops.config.Internationalization;
 import de.eindaniel.playerShops.config.PlayerData;
@@ -21,6 +23,7 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.Force;
 
 public class Main extends JavaPlugin {
 
@@ -61,7 +64,7 @@ public class Main extends JavaPlugin {
             return;
         }
 
-        new VersionChecker(this, "eindaniels", "PlayerShops").check((result, latest) -> {
+        new VersionChecker(this, "eindaniels", "PlayerShops", true).check((result, latest) -> {
             if (result == VersionChecker.Result.OUTDATED) {
                 getLogger().warning("PlayerShop Plugin is outdated!");
                 getLogger().warning("New Version -> " + latest);
@@ -85,6 +88,8 @@ public class Main extends JavaPlugin {
         CommandMap commandMap = Bukkit.getCommandMap();
         commandMap.register("playershops", new CreateShopCommand(this));
         commandMap.register("playershops", new RemoveShopCommand(this));
+        commandMap.register("playershops", new MasterCommand(this));
+        commandMap.register("playershops",new ForceDeleteShop(this));
 
         getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
         getServer().getPluginManager().registerEvents(new ProtectionListener(), this);

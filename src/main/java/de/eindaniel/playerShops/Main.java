@@ -1,6 +1,7 @@
 package de.eindaniel.playerShops;
 
 import de.eindaniel.playerShops.commands.CreateShopCommand;
+import de.eindaniel.playerShops.commands.ForceDeleteShop;
 import de.eindaniel.playerShops.commands.MasterCommand;
 import de.eindaniel.playerShops.commands.RemoveShopCommand;
 import de.eindaniel.playerShops.config.Internationalization;
@@ -22,6 +23,7 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.Force;
 
 public class Main extends JavaPlugin {
 
@@ -87,6 +89,7 @@ public class Main extends JavaPlugin {
         commandMap.register("playershops", new CreateShopCommand(this));
         commandMap.register("playershops", new RemoveShopCommand(this));
         commandMap.register("playershops", new MasterCommand(this));
+        commandMap.register("playershops",new ForceDeleteShop(this));
 
         getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
         getServer().getPluginManager().registerEvents(new ProtectionListener(), this);

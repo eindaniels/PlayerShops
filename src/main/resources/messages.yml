@@ -102,3 +102,6 @@ versioning.alpha: "<#E5484D>"
 versioning.beta: "<#F5A524>"
 versioning.rc: "<#3E8EF7>"
 versioning.stable: "<#30A46C>"
+
+
+forceremoveshop.removed: "<#1fff17>Der Shop wurde erfolgreich entfernt."

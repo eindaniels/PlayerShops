@@ -96,7 +96,7 @@ mainCommand.reload.failure: "<#ff1717>Beim Neuladen ist ein Fehler aufgetreten."
 mainCommand.version.outdated: "<gray>Aktuelle Version <dark_gray>- {0}{1} <#ff1717>(Die Build-Version ist veraltet! Neuste Version: v{2})"
 mainCommand.version.uptodate: "<gray>Aktuelle Version <dark_gray>- {0}{1} <#1fff17>(Up to date)"
 mainCommand.version.failed: "<gray>Aktuelle Version <dark_gray>- {0}{1} <#ff1717>(Konnte Version nicht überprüfen)"
-mainCommand.info: "<gray>Developer <dark_gray>- <#fbecab>eindaniels\n{0}<gray>Idee <dark_gray>- <#fbecab>Cytooxien.net"
+mainCommand.info: "<gray>Developer <dark_gray>- <#fbecab>eindaniels\n{0}<gray>Idee <dark_gray>- <#fbecab>Cytooxien.net\n{0}<gray>Translators <dark_gray>- <#fbecab>{1}"
 
 versioning.alpha: "<#E5484D>"
 versioning.beta: "<#F5A524>"

@@ -62,7 +62,7 @@ public class Main extends JavaPlugin {
             return;
         }
 
-        new VersionChecker(this, "eindaniels", "PlayerShops").check((result, latest) -> {
+        new VersionChecker(this, "eindaniels", "PlayerShops", true).check((result, latest) -> {
             if (result == VersionChecker.Result.OUTDATED) {
                 getLogger().warning("PlayerShop Plugin is outdated!");
                 getLogger().warning("New Version -> " + latest);

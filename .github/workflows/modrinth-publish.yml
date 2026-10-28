@@ -1,0 +1,76 @@
+name: Publish to Modrinth
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+env:
+  MODRINTH_PROJECT: kUQMdAUB
+  MIN_VERSION: "1.20"
+  LOADERS: |
+    paper
+    spigot
+    bukkit
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Channel aus Tag bestimmen
+        id: channel
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          case "$TAG" in
+            *alpha*)      CHANNEL=alpha;   PRE=true  ;;
+            *beta*|*rc*)  CHANNEL=beta;    PRE=true  ;;
+            *)            CHANNEL=release; PRE=false ;;
+          esac
+          echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRE"  >> "$GITHUB_OUTPUT"
+
+      - name: GitHub-Release als Pre-Release markieren (falls nötig)
+        if: steps.channel.outputs.prerelease == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release edit "$TAG" --prerelease
+
+      - name: Build
+        run: ./gradlew build -x test
+
+      - name: Game-Versions von Modrinth holen
+        id: gv
+        run: |
+          {
+            echo "versions<<EOF"
+            curl -fsS https://api.modrinth.com/v2/tag/game_version \
+              | jq -r --arg min "$MIN_VERSION" \
+                  '[.[] | select(.version_type=="release") | .version]
+                   | .[:index($min)+1] | .[]'
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Auf Modrinth veröffentlichen
+        uses: cloudnode-pro/modrinth-publish@v2
+        with:
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project: ${{ env.MODRINTH_PROJECT }}
+          name: PlayerShops ${{ github.event.release.tag_name }}
+          version: ${{ github.event.release.tag_name }}
+          channel: ${{ steps.channel.outputs.channel }}
+          changelog: ${{ github.event.release.body }}
+          loaders: ${{ env.LOADERS }}
+          game-versions: ${{ steps.gv.outputs.versions }}
+          files: build/libs/PlayerShops-*.jar

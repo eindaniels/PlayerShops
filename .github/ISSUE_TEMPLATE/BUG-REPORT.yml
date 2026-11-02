@@ -1,0 +1,98 @@
+name: Bug report
+description: Something in PlayerShops doesn't work as expected
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the form below so it can be reproduced and fixed quickly.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched the existing issues and this bug has not been reported yet.
+          required: true
+        - label: I tested with the latest PlayerShops version (`/ps version` shows whether you're up to date).
+          required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: PlayerShops version
+      description: Run `/ps version` in-game or check the plugin file name.
+      placeholder: "26.3-build.1-stable"
+    validations:
+      required: true
+
+  - type: input
+    id: server-software
+    attributes:
+      label: Server software and version
+      description: Run `/version` on your server and paste the output.
+      placeholder: "Paper 1.21.x build ###"
+    validations:
+      required: true
+
+  - type: input
+    id: java-version
+    attributes:
+      label: Java version
+      description: Run `java -version` on the server host.
+      placeholder: "Java 21"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear and concise description of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we trigger the bug ourselves?
+      placeholder: |
+        1. Place a shop with `/ps ...`
+        2. Click on ...
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console log / stack trace
+      description: Paste relevant errors from `logs/latest.log`. For long logs, use a paste service like mclo.gs and add the link.
+      render: shell
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant config
+      description: Paste the relevant parts of your `config.yml` if the bug may be config-related.
+      render: yaml
+
+  - type: textarea
+    id: plugins
+    attributes:
+      label: Other plugins
+      description: List plugins that might interact with PlayerShops (protection, economy, permissions, other shop plugins, ...).
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Screenshots, videos or anything else that helps.

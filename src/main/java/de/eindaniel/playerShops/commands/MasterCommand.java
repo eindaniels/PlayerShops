@@ -43,7 +43,7 @@ public class MasterCommand extends Command {
                 }
                 break;
             case "info":
-                player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(plugin.i18n().get("mainCommand.info", plugin.i18n().get("prefix")))));
+                player.sendMessage(Main.prefix().append(MiniMessage.miniMessage().deserialize(plugin.i18n().get("mainCommand.info", plugin.i18n().get("prefix", "eindaniels (German), Kn7ghtdemon (English)")))));
                 break;
             case "version":
                 new VersionChecker(plugin, "eindaniels", "PlayerShops", true).check((result, latest) -> {

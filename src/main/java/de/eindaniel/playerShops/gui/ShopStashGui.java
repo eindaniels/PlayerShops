@@ -86,7 +86,7 @@ public class ShopStashGui implements InventoryHolder {
      * @param title the inventory's title
      * @return if the title is the pre-defined shop stash title
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public static boolean isStash(Component title) {
         if (title == null) return false;
         return GuiTitleUtil.getRawTitle(title).contains(

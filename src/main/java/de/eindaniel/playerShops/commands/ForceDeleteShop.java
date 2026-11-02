@@ -27,6 +27,8 @@ public class ForceDeleteShop extends Command {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String @NotNull [] args) {
+        boolean confirm = args.length > 0 && args[0].equalsIgnoreCase("confirm");
+
         if (!(sender instanceof Player p)) {
             sender.sendMessage("Only players can use this command.");
             return true;
@@ -49,6 +51,11 @@ public class ForceDeleteShop extends Command {
 
         if (shopOpt.isEmpty()) {
             p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("removeshop.noShop"))));
+            return true;
+        }
+
+        if (!confirm) {
+            p.sendMessage(Main.prefix().append(MM.deserialize(plugin.i18n().get("forceremoveshop.confirmation"))));
             return true;
         }
 

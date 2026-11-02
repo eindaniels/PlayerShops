@@ -109,3 +109,4 @@ versioning.rc: "<#3E8EF7>"
 versioning.stable: "<#30A46C>"
 
 forceremoveshop.removed: "<#1fff17>The shop has been successfully removed."
+forceremoveshop.confirmation: "<#ff1717>Warning! This will permanently delete all items in this storage. <hover:show_text:\"<#fbecab>/forcedeleteshop confirm\"><click:run_command:forcedeleteshop confirm><dark_gray>[<#fbecab>Click to confirm<dark_gray>]"
